@@ -40,7 +40,6 @@ async function getBalance() {
         const balance = await c.getBalance(publicKey);
 
         console.log(balance.toNumber());
-        retu
     }
     catch(e){
         console.log(e);
