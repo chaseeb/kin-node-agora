@@ -1,0 +1,15 @@
+{
+  "name": "kin-node-2020",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@kinecosystem/kin-sdk-v2": "^0.1.4",
+    "express": "^4.17.1"
+  }
+}
