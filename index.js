@@ -1,18 +1,14 @@
 const express = require('express');
 const app = express();
+const sdk = require("@kinecosystem/kin-sdk-v2");
 
-const Client = require("@kinecosystem/kin-sdk-v2").Client;
-const Environment = require("@kinecosystem/kin-sdk-v2").Environment;
-const PrivateKey = require("@kinecosystem/kin-sdk-v2").PrivateKey;
-const PublicKey = require("@kinecosystem/kin-sdk-v2").PublicKey;
-const kinToQuarks = require("@kinecosystem/kin-sdk-v2").kinToQuarks;
+const c = new sdk.Client(sdk.Environment.Prod);
 
-const c = new Client(Environment.Prod);
-
+//generate new random private key and submit to Agora for account creation
 async function createAccount() { 
 
     try{
-        const privateKey = PrivateKey.random();
+        const privateKey = sdk.PrivateKey.random();
         const result = await c.createAccount(privateKey);
         console.log(privateKey.publicKey().stellarAddress());
     }
@@ -22,10 +18,11 @@ async function createAccount() {
 
 }
 
+//get transaction data from Agora using the transaction hash
 async function getTransaction() { 
 
     try{
-        const txHash = Buffer.from("TX HASH HERE", "hex");
+        const txHash = Buffer.from("TX_HASH_HERE", "hex");
         const transactionData = await c.getTransaction(txHash);
 
         console.log(transactionData);
@@ -36,10 +33,11 @@ async function getTransaction() {
 
 }
 
+//get balance of account from Agora using the public key 
 async function getBalance() { 
 
     try{
-        const publicKey = PublicKey.fromString('PUBLIC ADDRESS HERE');
+        const publicKey = sdk.PublicKey.fromString('PUBLIC_ADDRESS_HERE');
         const balance = await c.getBalance(publicKey);
 
         console.log(balance.toNumber());
@@ -50,21 +48,21 @@ async function getBalance() {
 
 }
 
+//send kin with Agora using the senders private key and receivers public key
 async function sendKin() { 
 
     try{
-        const sender = PrivateKey.fromString('PRIVATE KEY OF SENDER HERE');
-        const dest = PublicKey.fromString('PUBLIC KEY OF RECEIVER HERE');
+
+        const sender = sdk.PrivateKey.fromString('PRIVATE_KEY_OF_ENDER_HERE');
+        const dest = sdk.PublicKey.fromString('PUBLIC_KEY_OF_RECEIVER_HERE');
 
         let txHash = await c.submitPayment({
             sender: sender,
             destination: dest,
-            quarks: kinToQuarks("1")
+            quarks: sdk.kinToQuarks("1")
         });
 
         console.log(txHash.toString('hex'));
-
-        sendBatchKin();
 
     }
     catch (e){
@@ -72,18 +70,19 @@ async function sendKin() {
     }
 }
 
+//send multiple earn payments with Agora in a single transaction 
 async function sendBatchKin() { 
 
-    const sender = PrivateKey.fromString('PRIVATE KEY OF DEVELOPER ACCOUNT HERE');
+    const sender = sdk.PrivateKey.fromString('PRIVATE_KEY_OF_DEVELOPER_ACCOUNT_HERE');
 
     const earns = [
         {
-            destination: PublicKey.fromString("PUBLIC KEY OF RECEIVER HERE"),
-            quarks: kinToQuarks("1"),
+            destination: sdk.PublicKey.fromString("PUBLIC_KEY_OF_RECEIVER_HERE"),
+            quarks: sdk.kinToQuarks("1"),
         },
         {
-            destination: PublicKey.fromString("PUBLIC KEY OF RECEIVER HERE"),
-            quarks: kinToQuarks("1"),
+            destination: sdk.PublicKey.fromString("PUBLIC KEY OF RECEIVER HERE"),
+            quarks: sdk.kinToQuarks("1"),
         }
     ];
 
