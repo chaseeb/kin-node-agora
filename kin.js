@@ -1,9 +1,9 @@
 const sdk = require('@kinecosystem/kin-sdk-v2');
-const config = require('./config')
+const dotenv = require('dotenv').config();
 
 //initialize the Client with the environment, appIndex or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
-    appIndex: 'YOUR_APP_INDEX'
+    appIndex: process.env.appIndex
   });
 
 //generate new random private key and submit to Agora for account creation
@@ -27,6 +27,7 @@ async function getTransaction(tx) {
 
     try{
         const txHash = Buffer.from(tx, "hex");
+
         const transactionData = await client.getTransaction(txHash);
 
         console.log(transactionData);
@@ -79,7 +80,6 @@ async function sendKin(senderPrivate, destPublic, amount) {
 async function sendBatchKin(senderPrivate, payments) { 
 
     const sender = sdk.PrivateKey.fromString(senderPrivate);
-
     const earns = [
         {
             destination: sdk.PublicKey.fromString(payments[0].publicKey),
@@ -92,7 +92,6 @@ async function sendBatchKin(senderPrivate, payments) {
     ];
 
     try{
-
         const result = await client.submitEarnBatch({
             sender: sender,
             earns: earns,
@@ -100,7 +99,6 @@ async function sendBatchKin(senderPrivate, payments) {
 
         console.log(result.succeeded[0].txHash.toString('hex'));
         return result.succeeded[0].txHash.toString('hex');
-
     }
     catch (e){
         console.log(e);

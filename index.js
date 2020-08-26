@@ -7,7 +7,7 @@ const kin = require('./kin')
 app.get('/createAccount', async function(req, res) {
     try{
         const result = await kin.createAccount();
-        return res.send(result);
+        return res.json({publicKey:result});
     }
     catch(e){
         console.log(e);
@@ -18,7 +18,7 @@ app.get('/createAccount', async function(req, res) {
 app.get('/getTransaction', async function(req, res) {
     try{
         const result = await kin.getTransaction();
-        return res.send(result);
+        return res.json(result);
     }
     catch(e){
         console.log(e);
@@ -29,7 +29,7 @@ app.get('/getTransaction', async function(req, res) {
 app.get('/getBalance', async function(req, res) {
     try{
         const result = await kin.getBalance();
-        return res.send(result);
+        return res.json({balance:result});
     }
     catch(e){
         console.log(e);
@@ -40,7 +40,7 @@ app.get('/getBalance', async function(req, res) {
 app.get('/sendKin', async function(req, res) {
     try{
         const result = await kin.sendKin();
-        return res.send(result);
+        return res.json({txHash:result});
     }
     catch(e){
         console.log(e);
@@ -51,7 +51,7 @@ app.get('/sendKin', async function(req, res) {
 app.get('/sendBatchKin', async function(req, res) {
     try{
         const result = await kin.sendBatchKin();
-        return res.send(result);
+        return res.json({txHash:result});
     }
     catch(e){
         console.log(e);
