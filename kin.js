@@ -1,13 +1,18 @@
-const sdk = require("@kinecosystem/kin-sdk-v2");
+const sdk = require('@kinecosystem/kin-sdk-v2');
+const config = require('./config')
 
-const c = new sdk.Client(sdk.Environment.Test);
+//initialize the Client with the environment, appIndex or any other configurations you wish you use
+const client = new sdk.Client(sdk.Environment.Prod, {
+    appIndex: 'YOUR_APP_INDEX'
+  });
 
 //generate new random private key and submit to Agora for account creation
 async function createAccount() { 
 
     try{
         const privateKey = sdk.PrivateKey.random();
-        const result = await c.createAccount(privateKey);
+        const result = await client.createAccount(privateKey);
+
         console.log(privateKey.publicKey().stellarAddress());
         return(privateKey.publicKey().stellarAddress());
     }
@@ -18,13 +23,14 @@ async function createAccount() {
 }
 
 //get transaction data from Agora using the transaction hash
-async function getTransaction() { 
+async function getTransaction(tx) { 
 
     try{
-        const txHash = Buffer.from("TX_HASH_HERE", "hex");
-        const transactionData = await c.getTransaction(txHash);
+        const txHash = Buffer.from(tx, "hex");
+        const transactionData = await client.getTransaction(txHash);
 
         console.log(transactionData);
+        return transactionData;
     }
     catch(e){
         console.log(e);
@@ -33,13 +39,14 @@ async function getTransaction() {
 }
 
 //get balance of account from Agora using the public key 
-async function getBalance() { 
+async function getBalance(userPublic) { 
 
     try{
-        const publicKey = sdk.PublicKey.fromString('PUBLIC_ADDRESS_HERE');
-        const balance = await c.getBalance(publicKey);
+        const publicKey = sdk.PublicKey.fromString(userPublic);
+        const balance = await client.getBalance(publicKey);
 
         console.log(balance.toNumber());
+        return balance.toNumber();
     }
     catch(e){
         console.log(e);
@@ -48,21 +55,20 @@ async function getBalance() {
 }
 
 //send kin with Agora using the senders private key and receivers public key
-async function sendKin() { 
+async function sendKin(senderPrivate, destPublic, amount) { 
 
     try{
+        const sender = sdk.PrivateKey.fromString(senderPrivate);
+        const dest = sdk.PublicKey.fromString(destPublic);
 
-        const sender = sdk.PrivateKey.fromString('PRIVATE_KEY_OF_ENDER_HERE');
-        const dest = sdk.PublicKey.fromString('PUBLIC_KEY_OF_RECEIVER_HERE');
-
-        let txHash = await c.submitPayment({
+        let txHash = await client.submitPayment({
             sender: sender,
             destination: dest,
-            quarks: sdk.kinToQuarks("1")
+            quarks: sdk.kinToQuarks(amount)
         });
 
         console.log(txHash.toString('hex'));
-
+        return txHash.toString('hex');
     }
     catch (e){
         console.log(e);
@@ -70,29 +76,30 @@ async function sendKin() {
 }
 
 //send multiple earn payments with Agora in a single transaction 
-async function sendBatchKin() { 
+async function sendBatchKin(senderPrivate, payments) { 
 
-    const sender = sdk.PrivateKey.fromString('PRIVATE_KEY_OF_DEVELOPER_ACCOUNT_HERE');
+    const sender = sdk.PrivateKey.fromString(senderPrivate);
 
     const earns = [
         {
-            destination: sdk.PublicKey.fromString("PUBLIC_KEY_OF_RECEIVER_HERE"),
-            quarks: sdk.kinToQuarks("1"),
+            destination: sdk.PublicKey.fromString(payments[0].publicKey),
+            quarks: sdk.kinToQuarks(payments[0].amount),
         },
         {
-            destination: sdk.PublicKey.fromString("PUBLIC KEY OF RECEIVER HERE"),
-            quarks: sdk.kinToQuarks("1"),
+            destination: sdk.PublicKey.fromString(payments[1].publicKey),
+            quarks: sdk.kinToQuarks(payment[1].amount),
         }
     ];
 
     try{
 
-        const result = await c.submitEarnBatch({
+        const result = await client.submitEarnBatch({
             sender: sender,
             earns: earns,
         })
 
         console.log(result.succeeded[0].txHash.toString('hex'));
+        return result.succeeded[0].txHash.toString('hex');
 
     }
     catch (e){

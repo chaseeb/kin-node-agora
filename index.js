@@ -14,6 +14,50 @@ app.get('/createAccount', async function(req, res) {
     }
 });
 
+// Get Transaction Endpoint
+app.get('/getTransaction', async function(req, res) {
+    try{
+        const result = await kin.getTransaction();
+        return res.send(result);
+    }
+    catch(e){
+        console.log(e);
+    }
+});
+
+// Get Balance Endpoint
+app.get('/getBalance', async function(req, res) {
+    try{
+        const result = await kin.getBalance();
+        return res.send(result);
+    }
+    catch(e){
+        console.log(e);
+    }
+});
+
+// Send Kin Endpoint
+app.get('/sendKin', async function(req, res) {
+    try{
+        const result = await kin.sendKin();
+        return res.send(result);
+    }
+    catch(e){
+        console.log(e);
+    }
+});
+
+// Send Batch Kin Endpoint
+app.get('/sendBatchKin', async function(req, res) {
+    try{
+        const result = await kin.sendBatchKin();
+        return res.send(result);
+    }
+    catch(e){
+        console.log(e);
+    }
+});
+
 const port = process.env.PORT || 3000;
 
 const server = app.listen(port, function() {
