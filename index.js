@@ -65,18 +65,45 @@ app.get('/sendBatchKin', async function(req, res) {
 });
 
 // Sign Transaction Webhook Endpoint
-app.get('/signTransaction', async function(req, res) {
-    try{
+app.use("/sign_transaction", SignTransactionHandler(Environment.Prod, (req, resp) => {
+    console.log(`sign request for <'${req.userId}', '${req.userPassKey}'>: ${req.txHash().toString('hex')}`);
 
-        console.log("signTransaction endpoint");
+    for (let i = 0; i < req.payments.length; i++) {
+        const p = req.payments[i];
 
-        const result = await kin.signTransaction(req, resp);
-        return result;
+        // Double check that the transaction isn't trying to impersonate us
+        if (p.sender.equals(whitelistKey.publicKey())) {
+            resp.reject();
+            return;
+        }
+
+        // In this example, we don't want to whitelist transactions that aren't sending
+        // kin to us.
+        if (p.destination.equals(whitelistKey.publicKey())) {
+            resp.markWrongDestination(i);
+        }
+
+        if (p.invoice) {
+            for (let item of p.invoice.Items) {
+                if (!item.sku) {
+                    // Note: in general the sku is optional. However, in this example we
+                    //       mark it as SkuNotFound to facilitate testing.
+                    resp.markSkuNotFound(i);
+                }
+            }
+        }
     }
-    catch(e){
-        console.log(e);
+
+    // Note: if we _don't_ do this check here, the SDK won't send back a signed
+    //       transaction if this is set.
+    if (resp.isRejected()) {
+        return;
     }
-});
+
+    // Note: if we didn't sign or reject, then the transaction will still go through,
+    //       but fees will be charged.
+    resp.sign(whitelistKey);
+}, process.env.secret))
 
 // Events Webhook Endpoint
 app.get('/events', async function(req, res) {
