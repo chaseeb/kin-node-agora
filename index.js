@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const path = require('path')
 const kin = require('./kin')
+const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -65,7 +66,7 @@ app.get('/sendBatchKin', async function(req, res) {
 });
 
 // Sign Transaction Webhook Endpoint
-app.use("/sign_transaction", SignTransactionHandler(Environment.Prod, (req, resp) => {
+app.use("/sign_transaction", webhook.SignTransactionHandler(Environment.Prod, (req, resp) => {
     console.log(`sign request for <'${req.userId}', '${req.userPassKey}'>: ${req.txHash().toString('hex')}`);
 
     for (let i = 0; i < req.payments.length; i++) {
