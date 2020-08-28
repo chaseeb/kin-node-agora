@@ -4,7 +4,8 @@ const dotenv = require('dotenv').config();
 
 //initialize the Client with the environment, appIndex or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
-    appIndex: process.env.appIndex
+    appIndex: process.env.appIndex,
+    whitelistKey: prodPrivate
   });
 
 //generate new random private key and submit to Agora for account creation
