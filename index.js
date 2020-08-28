@@ -67,6 +67,9 @@ app.get('/sendBatchKin', async function(req, res) {
 // Sign Transaction Webhook Endpoint
 app.get('/signTransaction', async function(req, res) {
     try{
+
+        console.log("signTransaction endpoint");
+
         const result = await kin.signTransaction(req, resp);
         return result;
     }

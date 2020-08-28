@@ -108,6 +108,8 @@ async function sendBatchKin(senderPrivate, payments) {
 
 async function signTransaction(req, resp) { 
 
+    console.log('signTransaction function')
+
     return webhook.SignTransactionHandler(Environment.Prod, (req, resp) => {
 
         console.log(req, res);
