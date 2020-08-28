@@ -71,6 +71,8 @@ app.use('/signTransaction', express.json());
 app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
     console.log(`sign request for <'${req.userId}', '${req.userPassKey}'>: ${req.txHash().toString('hex')}`);
 
+    const whitelistKey = sdk.PrivateKey.fromString(process.env.prodPrivate);
+
     for (let i = 0; i < req.payments.length; i++) {
         const p = req.payments[i];
 
