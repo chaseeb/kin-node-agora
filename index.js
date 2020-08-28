@@ -67,7 +67,7 @@ app.get('/sendBatchKin', async function(req, res) {
 });
 
 // Sign Transaction Webhook Endpoint
-app.use('/agora-sign', express.json());
+app.use('/signTransaction', express.json());
 app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
     console.log(`sign request for <'${req.userId}', '${req.userPassKey}'>: ${req.txHash().toString('hex')}`);
 
@@ -105,7 +105,7 @@ app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod,
 
     // Note: if we didn't sign or reject, then the transaction will still go through,
     //       but fees will be charged.
-    resp.sign();
+    resp.sign(whitelistKey);
 }, process.env.secret))
 
 // Events Webhook Endpoint
