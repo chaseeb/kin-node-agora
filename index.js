@@ -69,7 +69,7 @@ app.get('/sendBatchKin', async function(req, res) {
 // Sign Transaction Webhook Endpoint
 app.use('/signTransaction', express.json());
 app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
-    console.log(`sign request for <'${req.txHash().toString('hex')}`);
+    console.log(`sign request for txID '${req.txHash().toString('hex')}`);
 
     const whitelistKey = sdk.PrivateKey.fromString(process.env.prodPrivate);
 
