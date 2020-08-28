@@ -121,5 +121,6 @@ module.exports = {
     getTransaction,
     getBalance,
     sendKin,
-    sendBatchKin
+    sendBatchKin,
+    signTransaction
 }
