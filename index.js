@@ -79,6 +79,7 @@ app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod,
         // Double check that the transaction isn't trying to impersonate us
         if (p.sender.equals(whitelistKey.publicKey())) {
             resp.reject();
+            console.log('test reject');
             return;
         }
 
