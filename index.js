@@ -74,10 +74,10 @@ app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod,
         const p = req.payments[i];
 
         // Double check that the transaction isn't trying to impersonate us
-        if (p.sender.equals(whitelistKey.publicKey())) {
-            resp.reject();
-            return;
-        }
+        // if (p.sender.equals(whitelistKey.publicKey())) {
+        //     resp.reject();
+        //     return;
+        // }
 
         // In this example, we don't want to whitelist transactions that aren't sending
         // kin to us.
@@ -104,7 +104,7 @@ app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod,
 
     // Note: if we didn't sign or reject, then the transaction will still go through,
     //       but fees will be charged.
-    resp.sign(whitelistKey);
+    resp.sign();
 }, process.env.secret))
 
 // Events Webhook Endpoint
