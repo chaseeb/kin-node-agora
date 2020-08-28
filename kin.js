@@ -8,8 +8,6 @@ const client = new sdk.Client(sdk.Environment.Prod, {
     whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate)
   });
 
-console.log(process.env.prodPrivate);
-
 //generate new random private key and submit to Agora for account creation
 async function createAccount() { 
 
@@ -64,12 +62,12 @@ async function sendKin(senderPrivate, destPublic, amount) {
 
     try{
         const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
-        const dest = sdk.PublicKey.fromString(process.env.prodPublic);
+        const dest = sdk.PublicKey.fromString(destPublic);
 
         let txHash = await client.submitPayment({
             sender: sender,
             destination: dest,
-            quarks: sdk.kinToQuarks("1")
+            quarks: sdk.kinToQuarks(amount)
         });
 
         console.log(txHash.toString('hex'));
