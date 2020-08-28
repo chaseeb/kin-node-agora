@@ -67,6 +67,7 @@ app.get('/sendBatchKin', async function(req, res) {
 });
 
 // Sign Transaction Webhook Endpoint
+app.use('/agora-sign', express.json());
 app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
     console.log(`sign request for <'${req.userId}', '${req.userPassKey}'>: ${req.txHash().toString('hex')}`);
 
