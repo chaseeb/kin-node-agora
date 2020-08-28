@@ -1,4 +1,5 @@
 const sdk = require('@kinecosystem/kin-sdk-v2');
+const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const dotenv = require('dotenv').config();
 
 //initialize the Client with the environment, appIndex or any other configurations you wish you use
@@ -103,6 +104,16 @@ async function sendBatchKin(senderPrivate, payments) {
     catch (e){
         console.log(e);
     }
+}
+
+async function signTransaction(req, resp) { 
+
+    return webhook.SignTransactionHandler(Environment.Prod, (req, resp) => {
+
+        console.log(req, res);
+
+    });
+
 }
 
 module.exports = {

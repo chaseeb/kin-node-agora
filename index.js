@@ -2,6 +2,10 @@ const express = require('express');
 const app = express();
 const path = require('path')
 const kin = require('./kin')
+const bodyParser = require('body-parser');
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 // Create Kin Account Endpoint
 app.get('/createAccount', async function(req, res) {
@@ -38,8 +42,21 @@ app.get('/getBalance', async function(req, res) {
 
 // Send Kin Endpoint
 app.get('/sendKin', async function(req, res) {
+
     try{
-        const result = await kin.sendKin();
+        const result = await kin.sendKin(process.env.prodPrivate, req.body.publicKey, req.body.amount);
+        return res.json({txHash:result});
+    }
+    catch(e){
+        console.log(e);
+    }
+
+});
+
+// Send Batch Kin Endpoint
+app.get('/sendBatchKin', async function(req, res) {
+    try{
+        const result = await kin.sendBatchKin();
         return res.json({txHash:result});
     }
     catch(e){
@@ -47,10 +64,21 @@ app.get('/sendKin', async function(req, res) {
     }
 });
 
-// Send Batch Kin Endpoint
-app.get('/sendBatchKin', async function(req, res) {
+// Sign Transaction Webhook Endpoint
+app.get('/signTransaction', async function(req, res) {
     try{
-        const result = await kin.sendBatchKin();
+        const result = await kin.signTransaction(req, resp);
+        return result;
+    }
+    catch(e){
+        console.log(e);
+    }
+});
+
+// Events Webhook Endpoint
+app.get('/events', async function(req, res) {
+    try{
+        const result = await kin.processEvent();
         return res.json({txHash:result});
     }
     catch(e){
