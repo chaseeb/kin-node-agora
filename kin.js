@@ -61,7 +61,7 @@ async function getBalance(userPublic) {
 async function sendKin(senderPrivate, destPublic, amount) { 
 
     try{
-        const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
+        const sender = sdk.PrivateKey.fromString(senderPrivate);
         const dest = sdk.PublicKey.fromString(destPublic);
 
         let txHash = await client.submitPayment({

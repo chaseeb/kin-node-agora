@@ -46,7 +46,7 @@ app.get('/getBalance', async function(req, res) {
 app.get('/sendKin', async function(req, res) {
 
     try{
-        const result = await kin.sendKin(process.env.prodPrivate, req.body.publicKey, req.body.amount);
+        const result = await kin.sendKin(req.body.senderPrivate, req.body.publicKey, req.body.amount);
         return res.json({txHash:result});
     }
     catch(e){
@@ -111,15 +111,12 @@ app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod,
 }, process.env.secret))
 
 // Events Webhook Endpoint
-app.get('/events', async function(req, res) {
-    try{
-        const result = await kin.processEvent();
-        return res.json({txHash:result});
+app.use("/events", express.json());
+app.use("/events", webhook.EventsHandler((events) => {
+    for (let e of events) {
+        console.log(`received event: ${JSON.stringify(e)}`)
     }
-    catch(e){
-        console.log(e);
-    }
-});
+}, process.env.secret));
 
 const port = process.env.PORT || 3000;
 
