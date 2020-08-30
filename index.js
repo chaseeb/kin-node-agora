@@ -113,6 +113,8 @@ app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod,
 // Events Webhook Endpoint
 app.use("/events", express.json());
 app.use("/events", webhook.EventsHandler((events) => {
+    console.log("/events");
+    console.log(events);
     for (let e of events) {
         console.log(`received event: ${JSON.stringify(e)}`)
     }
