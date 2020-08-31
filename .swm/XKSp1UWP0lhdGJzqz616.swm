@@ -1,6 +1,6 @@
 {
     "id": "XKSp1UWP0lhdGJzqz616",
-    "name": "Complete getTransaction endpoint and asynchronously return the value from the corresponding function in kin.js",
+    "name": "Complete Endpoint, call a function asynchronously and return the result to the user",
     "dod": "SW4lMjB0aGlzJTIwdW5pdCUyMHlvdSUyMHNob3VsZCUyMGNvbXBsZXRlJTIwdGhlJTIwZ2V0VHJhbnNhY3Rpb24lMjBlbmRwb2ludC4lMjBNYWtlJTIwc3VyZSUyMGl0JTIwY2F0Y2hlcyUyMGFuZCUyMGxvZ3MlMjBhbnklMjBlcnJvciUyME9SJTIwcmV0dXJucyUyMHRoZSUyMHJlc3VsdGluZyUyMHZhbHVlJTIwdG8lMjB0aGUlMjB1c2VyJTIwcmV0dXJuZWQlMjBmcm9tJTIwdGhlJTIwZ2V0VHJhbnNhY3Rpb24lMjBmdW5jdGlvbi4u",
     "description": "",
     "summary": "VG9kYXklMjB3ZSUyMGxlYXJuZWQlMjB0aGUlMjBwYXR0ZXJuJTIwZm9yJTIwY3JlYXRpbmclMjBhbiUyMGVuZHBvaW50JTIwYW5kJTIwY29ubmVjdGluZyUyMGl0JTIwdG8lMjBpdCdzJTIwY29ycmVzcG9uZGluZyUyMGZ1bmN0aW9uJTIwaW4lMjBhbm90aGVyJTIwanMlMjBmaWxlLg==",
