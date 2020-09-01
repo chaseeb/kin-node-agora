@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const path = require('path')
 const kin = require('./kin')
 const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const sdk = require('@kinecosystem/kin-sdk-v2');
@@ -17,6 +16,7 @@ app.get('/createAccount', async function(req, res) {
     }
     catch(e){
         console.log(e);
+        res.json({error: e});
     }
 });
 
@@ -28,6 +28,7 @@ app.get('/getTransaction', async function(req, res) {
     }
     catch(e){
         console.log(e);
+        res.json({error: e});
     }
 });
 
@@ -42,7 +43,7 @@ app.get('/getBalance', async function(req, res) {
     }
 });
 
-// Send Kin Endpoint
+// Endpoint to simulate a client sending kin to the app (spend) or anyother user(p2p)
 app.get('/sendKin', async function(req, res) {
 
     try{
@@ -51,18 +52,20 @@ app.get('/sendKin', async function(req, res) {
     }
     catch(e){
         console.log(e);
+        res.json({error: e});
     }
 
 });
 
-// Send Batch Kin Endpoint
-app.get('/sendBatchKin', async function(req, res) {
+//Endpoint notifying you a user has triggered an earn event in your app
+app.get('/addToEarnQueue', async function(req, res) {
     try{
-        const result = await kin.sendBatchKin();
-        return res.json({txHash:result});
+        const result = await kin.addToEarnQueue(req.body.dest, req.body.amount);
+        return res.sendStatus(result);
     }
     catch(e){
         console.log(e);
+        res.json({error: e});
     }
 });
 

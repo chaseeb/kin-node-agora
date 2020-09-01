@@ -1,6 +1,6 @@
 const sdk = require('@kinecosystem/kin-sdk-v2');
-const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const dotenv = require('dotenv').config();
+var CronJob = require('cron').CronJob;
 
 //initialize the Client with the environment, appIndex or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
@@ -29,7 +29,6 @@ async function getTransaction(tx) {
 
     try{
         const txHash = Buffer.from(tx, "hex");
-
         const transactionData = await client.getTransaction(txHash);
 
         console.log(transactionData);
@@ -67,7 +66,8 @@ async function sendKin(senderPrivate, destPublic, amount) {
         let txHash = await client.submitPayment({
             sender: sender,
             destination: dest,
-            quarks: sdk.kinToQuarks(amount)
+            quarks: sdk.kinToQuarks(amount),
+            type: sdk.TransactionType.Spend
         });
 
         console.log(txHash.toString('hex'));
@@ -78,39 +78,50 @@ async function sendKin(senderPrivate, destPublic, amount) {
     }
 }
 
-//send multiple earn payments with Agora in a single transaction 
-async function sendBatchKin(senderPrivate, payments) { 
+let earns = [];
+async function addToEarnQueue(dest, amount) { 
 
-    const sender = sdk.PrivateKey.fromString(senderPrivate);
-    const earns = [
+    earns.push(        
         {
-            destination: sdk.PublicKey.fromString(payments[0].publicKey),
-            quarks: sdk.kinToQuarks(payments[0].amount),
-        },
-        {
-            destination: sdk.PublicKey.fromString(payments[1].publicKey),
-            quarks: sdk.kinToQuarks(payment[1].amount),
+            destination: sdk.PublicKey.fromString(dest),
+            quarks: sdk.kinToQuarks(amount),
+            type: sdk.TransactionType.Earn
         }
-    ];
+    )
 
-    try{
-        const result = await client.submitEarnBatch({
-            sender: sender,
-            earns: earns,
-        })
-
-        console.log(result.succeeded[0].txHash.toString('hex'));
-        return result.succeeded[0].txHash.toString('hex');
-    }
-    catch (e){
-        console.log(e);
-    }
+    return(200);
+    
 }
+
+var CronJob = require('cron').CronJob;
+var job = new CronJob('*/10 * * * * *', async function() {
+    const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
+
+    const earnList = earns;
+    earns = [];
+
+    if(earnList.length > 0){
+        try{
+            const result = await client.submitEarnBatch({
+                sender: sender,
+                earns: earnList
+            });
+    
+            console.log(result.succeeded[0].txHash.toString('hex'));
+            return result.succeeded[0].txHash.toString('hex');
+        }
+        catch (e){
+            console.log(e);
+        }
+    }
+
+}, null, true, 'America/Los_Angeles');
+job.start();
 
 module.exports = {
     createAccount,
     getTransaction,
     getBalance,
     sendKin,
-    sendBatchKin
+    addToEarnQueue
 }
