@@ -2,7 +2,7 @@ const sdk = require('@kinecosystem/kin-sdk-v2');
 const dotenv = require('dotenv').config();
 var CronJob = require('cron').CronJob;
 
-//initialize the Client with the environment, appIndex or any other configurations you wish you use
+//initialize the Client with the environment, appIndex, whitlist secret key or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
     appIndex: process.env.appIndex,
     whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate)

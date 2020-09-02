@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// Create Kin Account Endpoint
+// Create Kin Account w/ Public Address
 app.get('/createAccount', async function(req, res) {
     try{
         const result = await kin.createAccount();
@@ -20,7 +20,7 @@ app.get('/createAccount', async function(req, res) {
     }
 });
 
-// Get Transaction Endpoint
+// Get Transaction by TransactionId
 app.get('/getTransaction', async function(req, res) {
     try{
         const result = await kin.getTransaction(req.body.txId);
@@ -32,7 +32,7 @@ app.get('/getTransaction', async function(req, res) {
     }
 });
 
-// Get Balance Endpoint
+// Get Balance by Public Address
 app.get('/getBalance', async function(req, res) {
     try{
         const result = await kin.getBalance(req.body.pubicAddress);
@@ -43,7 +43,7 @@ app.get('/getBalance', async function(req, res) {
     }
 });
 
-// Endpoint to simulate a client sending kin to the app (spend) or anyother user(p2p)
+// Simulate a client sending kin to the app (spend) or anyother user(p2p)
 app.get('/sendKin', async function(req, res) {
 
     try{
@@ -57,7 +57,7 @@ app.get('/sendKin', async function(req, res) {
 
 });
 
-//Endpoint notifying you a user has triggered an earn event in your app
+// Add transaction to queue for later processing
 app.get('/addToEarnQueue', async function(req, res) {
     try{
         const result = await kin.addToEarnQueue(req.body.dest, req.body.amount);
@@ -69,7 +69,7 @@ app.get('/addToEarnQueue', async function(req, res) {
     }
 });
 
-// Sign Transaction Webhook Endpoint
+// Sign a spend Transaction to whitelist it (or not
 app.use('/signTransaction', express.json());
 app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
     console.log(`sign request for txID '${req.txHash().toString('hex')}`);
@@ -113,7 +113,7 @@ app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod,
     resp.sign(whitelistKey);
 }, process.env.secret))
 
-// Events Webhook Endpoint
+// Webhook to receive all transaction events that happen using your AppIndex
 app.use("/events", express.json());
 app.use("/events", webhook.EventsHandler((events) => {
     console.log("/events");
