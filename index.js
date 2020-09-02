@@ -23,7 +23,7 @@ app.get('/createAccount', async function(req, res) {
 // Get Transaction Endpoint
 app.get('/getTransaction', async function(req, res) {
     try{
-        const result = await kin.getTransaction();
+        const result = await kin.getTransaction(req.body.txId);
         return res.json(result);
     }
     catch(e){
@@ -35,7 +35,7 @@ app.get('/getTransaction', async function(req, res) {
 // Get Balance Endpoint
 app.get('/getBalance', async function(req, res) {
     try{
-        const result = await kin.getBalance();
+        const result = await kin.getBalance(req.body.pubicAddress);
         return res.json({balance:result});
     }
     catch(e){

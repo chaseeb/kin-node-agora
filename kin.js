@@ -25,7 +25,7 @@ async function createAccount() {
 }
 
 //get transaction data from Agora using the transaction hash
-async function getTransaction(tx) { 
+async function getTransaction(txId) { 
 
     try{
         const txHash = Buffer.from(tx, "hex");
@@ -41,11 +41,11 @@ async function getTransaction(tx) {
 }
 
 //get balance of account from Agora using the public key 
-async function getBalance(userPublic) { 
+async function getBalance(publicAddress) { 
 
     try{
         const publicKey = sdk.PublicKey.fromString(userPublic);
-        const balance = await client.getBalance(publicKey);
+        const balance = await client.getBalance(publicAddress);
 
         console.log(balance.toNumber());
         return balance.toNumber();
