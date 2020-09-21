@@ -8,6 +8,19 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
+
+// Takes the name of kin function and required params and sends to router to process accordingly
+// app.get('/kin', async function(req, res) {
+//     try{
+//         const result = await kin.router(req.body);
+//         return res.json(result);
+//     }
+//     catch(e){
+//         console.log(e);
+//         res.json({error: e});
+//     }
+// });
+
 // Create Kin Account w/ Public Address
 app.get('/createAccount', async function(req, res) {
     try{
@@ -57,7 +70,7 @@ app.get('/sendKin', async function(req, res) {
 
 });
 
-// Add transaction to queue for later processing
+// Add transaction to queue for later batch processing
 app.get('/addToEarnQueue', async function(req, res) {
     try{
         const result = await kin.addToEarnQueue(req.body.dest, req.body.amount);

@@ -8,6 +8,18 @@ const client = new sdk.Client(sdk.Environment.Prod, {
     whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate)
   });
 
+// Route to the proper function
+// async function router() { 
+
+//     try{
+
+//     }
+//     catch(e){
+
+//     }
+
+// }
+
 //generate new random private key and submit to Agora for account creation
 async function createAccount() { 
 
