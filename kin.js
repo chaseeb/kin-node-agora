@@ -1,6 +1,6 @@
 const sdk = require('@kinecosystem/kin-sdk-v2');
 const dotenv = require('dotenv').config();
-var CronJob = require('cron').CronJob;
+const CronJob = require('cron').CronJob;
 
 //initialize the Client with the environment, appIndex, whitlist secret key or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
@@ -8,67 +8,75 @@ const client = new sdk.Client(sdk.Environment.Prod, {
     whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate)
   });
 
-// Route to the proper function
-// async function router() { 
-
-//     try{
-
-//     }
-//     catch(e){
-
-//     }
-
-// }
-
-//generate new random private key and submit to Agora for account creation
+//generate new random private key
+//use private key to create account
 async function createAccount() { 
 
-    try{
-        const privateKey = sdk.PrivateKey.random();
-        const result = await client.createAccount(privateKey);
+    const privateKey = sdk.PrivateKey.random();
+    const result = await client.createAccount(privateKey);
 
-        console.log(privateKey.publicKey().stellarAddress());
-        return(privateKey.publicKey().stellarAddress());
-    }
-    catch(e){
-        console.log(e);
-    }
+    return({public:privateKey.publicKey().stellarAddress(), private:privateKey.stellarSeed()});
 
 }
 
-//get transaction data from Agora using the transaction hash
-async function getTransaction(txId) { 
-
-    try{
-        const txHash = Buffer.from(tx, "hex");
-        const transactionData = await client.getTransaction(txHash);
-
-        console.log(transactionData);
-        return transactionData;
-    }
-    catch(e){
-        console.log(e);
-    }   
-
-}
-
-//get balance of account from Agora using the public key 
+//get balance of account using the public key 
 async function getBalance(publicAddress) { 
 
-    try{
-        const publicKey = sdk.PublicKey.fromString(userPublic);
-        const balance = await client.getBalance(publicAddress);
+    const publicKey = sdk.PublicKey.fromString(publicAddress);
+    const balance = await client.getBalance(publicKey);
 
-        console.log(balance.toNumber());
-        return balance.toNumber();
-    }
-    catch(e){
-        console.log(e);
-    }   
+    return {balance: balance.toNumber()};
 
 }
 
-//send kin with Agora using the senders private key and receivers public key
+//get transaction data using the transaction hash
+async function getTransaction(txId) { 
+
+    const txHash = Buffer.from(txId, "hex");
+    const transactionData = await client.getTransaction(txHash);
+
+    return transactionData
+
+}
+
+//Validate the earn event
+//Add to queue if all checks pass
+async function earnEvent(dest, Amount) { 
+
+    //test data
+    let isMyUser = true;
+    let validAmount = true;
+    let validType = true;
+    let earnLimitExceeded = false;
+
+    //Do some checks to make sure this is legit user and transaction
+    //These are just examples and should be specific to your app
+
+    if(!isMyUser){
+        // log user data, ip and return (for later evaluation of fraud)
+        return 500;
+    }
+
+    if(!validAmount){
+        // log user data, ip and return (for later evaluation of fraud)
+        return 500;
+    }
+
+    if(!validType){
+        // log user data, ip and return (for later evaluation of fraud)
+        return 500;
+    }
+
+    if(earnLimitExceeded){
+        return 500;
+    }    
+
+    //all checks passed, add to earn queue for processing
+    return addToEarnQueue(dest, amount);
+
+}
+
+//send kin with using the senders private key and receivers public key
 async function sendKin(senderPrivate, destPublic, amount) { 
 
     try{
@@ -90,7 +98,10 @@ async function sendKin(senderPrivate, destPublic, amount) {
     }
 }
 
+//earn queue 
 let earns = [];
+
+//
 async function addToEarnQueue(dest, amount) { 
 
     earns.push(        
@@ -101,11 +112,10 @@ async function addToEarnQueue(dest, amount) {
         }
     )
 
-    return(200);
+    return 200;
     
 }
 
-var CronJob = require('cron').CronJob;
 var job = new CronJob('*/10 * * * * *', async function() {
     const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
 
@@ -135,5 +145,5 @@ module.exports = {
     getTransaction,
     getBalance,
     sendKin,
-    addToEarnQueue
+    earnEvent
 }

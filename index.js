@@ -8,36 +8,35 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-
-// Takes the name of kin function and required params and sends to router to process accordingly
-// app.get('/kin', async function(req, res) {
-//     try{
-//         const result = await kin.router(req.body);
-//         return res.json(result);
-//     }
-//     catch(e){
-//         console.log(e);
-//         res.json({error: e});
-//     }
-// });
-
-// Create Kin Account w/ Public Address
+// Create Kin Account
+// For server use only (channels), not for creating client user accounts
 app.get('/createAccount', async function(req, res) {
     try{
         const result = await kin.createAccount();
-        return res.json({publicKey:result});
+        return res.status(200).json(result);
     }
     catch(e){
         console.log(e);
-        res.json({error: e});
+        res.status(500).json({error: "Account creation failure."});
     }
 });
 
-// Get Transaction by TransactionId
+// Get Balance of user by Public Address
+app.get('/getBalance', async function(req, res) {
+    try{
+        const result = await kin.getBalance(req.body.publicAddress);
+        return res.status(200).json(result);
+    }
+    catch(e){
+        console.log(e);
+    }
+});
+
+// Get Transaction of user by TransactionId
 app.get('/getTransaction', async function(req, res) {
     try{
         const result = await kin.getTransaction(req.body.txId);
-        return res.json(result);
+        return res.status(200).json(result);
     }
     catch(e){
         console.log(e);
@@ -45,33 +44,9 @@ app.get('/getTransaction', async function(req, res) {
     }
 });
 
-// Get Balance by Public Address
-app.get('/getBalance', async function(req, res) {
-    try{
-        const result = await kin.getBalance(req.body.pubicAddress);
-        return res.json({balance:result});
-    }
-    catch(e){
-        console.log(e);
-    }
-});
-
-// Simulate a client sending kin to the app (spend) or anyother user(p2p)
-app.get('/sendKin', async function(req, res) {
-
-    try{
-        const result = await kin.sendKin(req.body.senderPrivate, req.body.publicKey, req.body.amount);
-        return res.json({txHash:result});
-    }
-    catch(e){
-        console.log(e);
-        res.json({error: e});
-    }
-
-});
-
-// Add transaction to queue for later batch processing
-app.get('/addToEarnQueue', async function(req, res) {
+// Earn Event Triggered by User in App
+// Add to earn queue if valid earn (type, amount, etc)
+app.get('/earnEvent', async function(req, res) {
     try{
         const result = await kin.addToEarnQueue(req.body.dest, req.body.amount);
         return res.sendStatus(result);
@@ -82,7 +57,8 @@ app.get('/addToEarnQueue', async function(req, res) {
     }
 });
 
-// Sign a spend Transaction to whitelist it (or not
+// Sign a spend Transaction to whitelist it
+// This webhook is called when your user spends Kin in your app
 app.use('/signTransaction', express.json());
 app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
     console.log(`sign request for txID '${req.txHash().toString('hex')}`);
@@ -127,14 +103,28 @@ app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod,
 }, process.env.secret))
 
 // Webhook to receive all transaction events that happen using your AppIndex
+// This is not required, but can be useful to track and store kin events happening in your app
 app.use("/events", express.json());
 app.use("/events", webhook.EventsHandler((events) => {
-    console.log("/events");
-    console.log(events);
     for (let e of events) {
         console.log(`received event: ${JSON.stringify(e)}`)
     }
 }, process.env.secret));
+
+// Simulate a client sending kin to the app (spend) or anyother user(p2p)
+// Testing purposes only
+app.get('/sendKin', async function(req, res) {
+
+    try{
+        const result = await kin.sendKin(req.body.senderPrivate, req.body.publicKey, req.body.amount);
+        return res.json({txHash:result});
+    }
+    catch(e){
+        console.log(e);
+        res.json({error: e});
+    }
+
+});
 
 const port = process.env.PORT || 3000;
 
