@@ -98,7 +98,7 @@ async function sendKin(senderPrivate, destPublic, amount) {
     }
 }
 
-//earn queue 
+//earn queue (not meant for production, will not save state on server crash)
 let earns = [];
 
 //
