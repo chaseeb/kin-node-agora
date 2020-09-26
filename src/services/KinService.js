@@ -116,11 +116,15 @@ async function addToEarnQueue(dest, amount) {
     
 }
 
+//// Kin Jobs ///
+
 var job = new CronJob('*/10 * * * * *', async function() {
     const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
 
     const earnList = earns;
     earns = [];
+
+    console.log('Process Earn Queue Job Started...');
 
     if(earnList.length > 0){
         try{
@@ -130,11 +134,17 @@ var job = new CronJob('*/10 * * * * *', async function() {
             });
     
             console.log(result.succeeded[0].txHash.toString('hex'));
+
+            console.log('Process Earn Queue Job Complete - Earns Processed...');
             return result.succeeded[0].txHash.toString('hex');
         }
         catch (e){
+            console.log('Process Earn Queue Job Error...');
             console.log(e);
         }
+    }
+    else {
+        console.log('Process Earn Queue Job Complete - No Earns Processed...');
     }
 
 }, null, true, 'America/Los_Angeles');
@@ -145,5 +155,6 @@ module.exports = {
     getTransaction,
     getBalance,
     sendKin,
-    earnEvent
+    earnEvent,
+    job
 }
