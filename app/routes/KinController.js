@@ -1,16 +1,16 @@
 const express = require('express');
-const app = express();
-const kin = require('./kin')
+const router = express.Router();
+const kin = require('../kin');
 const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const sdk = require('@kinecosystem/kin-sdk-v2');
 const bodyParser = require('body-parser');
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+router.use(bodyParser.urlencoded({ extended: false }));
+router.use(bodyParser.json());
 
 // Create Kin Account
 // For server use only (channels), not for creating client user accounts
-app.get('/createAccount', async function(req, res) {
+router.get('/createAccount', async function(req, res) {
     try{
         const result = await kin.createAccount();
         return res.status(200).json(result);
@@ -22,7 +22,7 @@ app.get('/createAccount', async function(req, res) {
 });
 
 // Get Balance of user by Public Address
-app.get('/getBalance', async function(req, res) {
+router.get('/getBalance', async function(req, res) {
     try{
         const result = await kin.getBalance(req.body.publicAddress);
         return res.status(200).json(result);
@@ -33,7 +33,7 @@ app.get('/getBalance', async function(req, res) {
 });
 
 // Get Transaction of user by TransactionId
-app.get('/getTransaction', async function(req, res) {
+router.get('/getTransaction', async function(req, res) {
     try{
         const result = await kin.getTransaction(req.body.txId);
         return res.status(200).json(result);
@@ -46,7 +46,7 @@ app.get('/getTransaction', async function(req, res) {
 
 // Earn Event Triggered by User in App
 // Add to earn queue if valid earn (type, amount, etc)
-app.get('/earnEvent', async function(req, res) {
+router.get('/earnEvent', async function(req, res) {
     try{
         const result = await kin.addToEarnQueue(req.body.dest, req.body.amount);
         return res.sendStatus(result);
@@ -59,8 +59,8 @@ app.get('/earnEvent', async function(req, res) {
 
 // Sign a spend Transaction to whitelist it
 // This webhook is called when your user spends Kin in your app
-app.use('/signTransaction', express.json());
-app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
+router.use('/signTransaction', express.json());
+router.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
     console.log(`sign request for txID '${req.txHash().toString('hex')}`);
 
     const whitelistKey = sdk.PrivateKey.fromString(process.env.prodPrivate);
@@ -104,8 +104,8 @@ app.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod,
 
 // Webhook to receive all transaction events that happen using your AppIndex
 // This is not required, but can be useful to track and store kin events happening in your app
-app.use("/events", express.json());
-app.use("/events", webhook.EventsHandler((events) => {
+router.use("/events", express.json());
+router.use("/events", webhook.EventsHandler((events) => {
     for (let e of events) {
         console.log(`received event: ${JSON.stringify(e)}`)
     }
@@ -113,7 +113,7 @@ app.use("/events", webhook.EventsHandler((events) => {
 
 // Simulate a client sending kin to the app (spend) or anyother user(p2p)
 // Testing purposes only
-app.get('/sendKin', async function(req, res) {
+router.get('/sendKin', async function(req, res) {
 
     try{
         const result = await kin.sendKin(req.body.senderPrivate, req.body.publicKey, req.body.amount);
@@ -126,8 +126,4 @@ app.get('/sendKin', async function(req, res) {
 
 });
 
-const port = process.env.PORT || 3000;
-
-const server = app.listen(port, function() {
-  console.log('Express server listening on port ' + port);
-});
+module.exports = router;
