@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const kin = require('../kin');
+const kin = require('../services/kin');
 const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const sdk = require('@kinecosystem/kin-sdk-v2');
 const bodyParser = require('body-parser');
