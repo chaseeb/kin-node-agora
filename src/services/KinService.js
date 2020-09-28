@@ -41,7 +41,7 @@ async function getTransaction(txId) {
 
 //Validate the earn event
 //Add to queue if all checks pass
-async function earnEvent(dest, Amount) { 
+async function earnEvent(dest, amount) { 
 
     //test data
     let isMyUser = true;

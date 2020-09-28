@@ -5,7 +5,6 @@ const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const sdk = require('@kinecosystem/kin-sdk-v2');
 const bodyParser = require('body-parser');
 
-router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json());
 
 // Create Kin Account
