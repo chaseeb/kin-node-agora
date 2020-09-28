@@ -2,17 +2,18 @@
 
 API leveraging the Kin-Node SDK.
 
-This example app will show basic usage for creating accounts, submitting payments, submitting batch earns, checking balances, checking transacaction data and receiving Sign and Event webhook calls.
+This example Node API will show basic usage for creating accounts, submitting payments, submitting batch earns, checking balances, checking transacaction data and receiving Sign and Event webhook calls.
 
 Setup:
 
 - Clone the repo
 - run "npm install" in your local directory
-- update the .env file with the recommended variables
+- update the .env file with the recommended variables (TODO)
 
 Start:
 
-Run "node index.js"
+Navigate to main project directory in terminal
+Run "node /src/index.js"
 
 Testing:
 
