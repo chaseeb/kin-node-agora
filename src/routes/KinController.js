@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const kin = require('../services/KinService');
+const KinService = require('../services/KinService');
 const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const sdk = require('@kinecosystem/kin-sdk-v2');
 const bodyParser = require('body-parser');
@@ -12,7 +12,7 @@ router.use(bodyParser.json());
 // For server use only (channels), not for creating client user accounts
 router.get('/createAccount', async function(req, res) {
     try{
-        const result = await kin.createAccount();
+        const result = await KinService.createAccount();
         return res.status(200).json(result);
     }
     catch(e){
@@ -24,7 +24,7 @@ router.get('/createAccount', async function(req, res) {
 // Get Balance of user by Public Address
 router.get('/getBalance', async function(req, res) {
     try{
-        const result = await kin.getBalance(req.body.publicAddress);
+        const result = await KinService.getBalance(req.body.publicAddress);
         return res.status(200).json(result);
     }
     catch(e){
@@ -35,7 +35,7 @@ router.get('/getBalance', async function(req, res) {
 // Get Transaction of user by TransactionId
 router.get('/getTransaction', async function(req, res) {
     try{
-        const result = await kin.getTransaction(req.body.txId);
+        const result = await KinService.getTransaction(req.body.txId);
         return res.status(200).json(result);
     }
     catch(e){
@@ -48,7 +48,7 @@ router.get('/getTransaction', async function(req, res) {
 // Add to earn queue if valid earn (type, amount, etc)
 router.get('/earnEvent', async function(req, res) {
     try{
-        const result = await kin.addToEarnQueue(req.body.dest, req.body.amount);
+        const result = await KinService.addToEarnQueue(req.body.dest, req.body.amount);
         return res.sendStatus(result);
     }
     catch(e){
@@ -116,7 +116,7 @@ router.use("/events", webhook.EventsHandler((events) => {
 router.get('/sendKin', async function(req, res) {
 
     try{
-        const result = await kin.sendKin(req.body.senderPrivate, req.body.publicKey, req.body.amount);
+        const result = await KinService.sendKin(req.body.senderPrivate, req.body.publicKey, req.body.amount);
         return res.json({txHash:result});
     }
     catch(e){
