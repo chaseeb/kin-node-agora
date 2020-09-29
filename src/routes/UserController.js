@@ -23,6 +23,32 @@ router.post('/register', async function(req, res) {
 
 });
 
+// Updates a single user in the database
+router.put('/update/:id', async function (req, res) {
+
+  try{
+    const user = await UserService.update(req.params.id, req.body.email);  
+    res.status(200).json('User email has been updated to ' + user.email);    
+  } catch(e){
+    console.log(e);
+    res.status(500).json({error: e});
+  }
+
+});
+
+// Deletes a single user from the database
+router.delete('/delete/:id', async function (req, res) {
+
+  try{
+    const user = await UserService.deleteuser(req.params.id);
+    res.status(200).json(user.email + ' has been deleted');
+  } catch(e){
+    console.log(e);
+    res.status(500).json({error: e});
+  }
+
+});
+
 // // Returns all users from the database
 // router.get('/getall', async function (req, res) {
 
@@ -50,36 +76,6 @@ router.post('/register', async function(req, res) {
 //     } catch (err){
 //       res.status(500).json({error: err});
 //     }
-
-// });
-
-// // Deletes a single user from the database
-// router.delete('/delete/:id', async function (req, res) {
-
-//     try{
-//       const user = await User.findById(req.params.id)
-//       .exec();
-//       await user.delete();
-//       res.status(200).json(user.email + ' has been deleted');
-//     } catch(err){
-//       res.status(500).json({error: err});
-//     }
-
-// });
-
-// // Updates a single user in the database
-// router.put('/update/:id', async function (req, res) {
-
-//     try{
-//       const user = await User
-//         .findById(req.params.id)
-//         .exec();
-//       user.email = req.body.email;
-//       await user.save();
-//       res.status(200).json('User email has been updated to ' + user.email);    
-//     } catch(err){
-//       res.status(500).json({error: err});
-//   }
 
 // });
 
