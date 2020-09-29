@@ -54,21 +54,21 @@ async function earnEvent(dest, amount) {
 
     if(!isMyUser){
         // log user data, ip and return (for later evaluation of fraud)
-        return 500;
+        return 403;
     }
 
     if(!validAmount){
         // log user data, ip and return (for later evaluation of fraud)
-        return 500;
+        return 403;
     }
 
     if(!validType){
         // log user data, ip and return (for later evaluation of fraud)
-        return 500;
+        return 403;
     }
 
     if(earnLimitExceeded){
-        return 500;
+        return 403;
     }    
 
     //all checks passed, add to earn queue for processing

@@ -7,5 +7,8 @@ const server = app.listen(port, function() {
   console.log('Express server listening on port ' + port);
 });
 
+const UserController = require('./routes/UserController');
+app.use('/api/user', UserController);
+
 const KinController = require('./routes/KinController');
 app.use('/api/kin', KinController);
