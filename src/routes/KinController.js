@@ -112,6 +112,7 @@ router.use("/events", webhook.EventsHandler((events) => {
 
 // Simulate a client sending kin to the app (spend) or anyother user(p2p)
 // Testing purposes only
+// You NEVER send a private key over the internet in production
 router.get('/sendKin', async function(req, res) {
 
     try{
