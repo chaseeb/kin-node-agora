@@ -75,7 +75,7 @@ router.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Pr
 
         // In this example, we don't want to whitelist transactions that aren't sending
         // kin to us.
-        if (p.destination.equals(whitelistKey.publicKey())) {
+        if (!p.destination.equals(whitelistKey.publicKey())) {
             resp.markWrongDestination(i);
         }
 
