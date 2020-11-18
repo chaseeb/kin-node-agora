@@ -4,6 +4,7 @@ const KinService = require('../services/KinService');
 const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const sdk = require('@kinecosystem/kin-sdk-v2');
 const bodyParser = require('body-parser');
+const dotenv = require('dotenv').config();
 
 router.use(bodyParser.json());
 
@@ -57,7 +58,7 @@ router.get('/earnEvent', async function(req, res) {
 });
 
 // Sign a spend Transaction to whitelist it
-// This webhook is called when your user spends Kin in your app (as long as it uses your app index)
+// This webhook is called when your user spends Kin in your app
 router.use('/signTransaction', express.json());
 router.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
     console.log(`sign request for txID '${req.txHash().toString('hex')}`);
@@ -75,7 +76,7 @@ router.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Pr
 
         // In this example, we don't want to whitelist transactions that aren't sending
         // kin to us.
-        if (!p.destination.equals(whitelistKey.publicKey())) {
+        if (p.destination.equals(whitelistKey.publicKey())) {
             resp.markWrongDestination(i);
         }
 
@@ -112,7 +113,6 @@ router.use("/events", webhook.EventsHandler((events) => {
 
 // Simulate a client sending kin to the app (spend) or anyother user(p2p)
 // Testing purposes only
-// You NEVER send a private key over the internet in production
 router.get('/sendKin', async function(req, res) {
 
     try{
