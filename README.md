@@ -8,12 +8,16 @@ Setup:
 
 - Clone the repo
 - run "npm install" in your local directory
-- update the .env in /src with your whitelisted key, appindex, and webhook secret
+- create a .env file in /src with your whitelisted key, appindex, and webhook secret
+
+prodPrivate='your whitelisted key here'
+appIndex=your app index here
+webhook_secret=your webhook secret here
 
 Start:
 
 Navigate to main project directory in terminal
-Run "node /src/index.js"
+Run "node /src/app.js"
 
 Testing:
 
