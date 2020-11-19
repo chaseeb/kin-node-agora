@@ -121,8 +121,10 @@ async function addToEarnQueue(dest, amount) {
 var job = new CronJob('*/10 * * * * *', async function() {
     const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
 
-    const privateKey = sdk.PrivateKey.random();
+    const privateKey = await sdk.PrivateKey.random();
     const result = await client.createAccount(privateKey);
+
+    console.log(privateKey.stellarSeed);
 
     const earnList = earns;
     earns = [];
