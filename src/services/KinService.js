@@ -124,7 +124,7 @@ var job = new CronJob('*/10 * * * * *', async function() {
     const privateKey = await sdk.PrivateKey.random();
     const result = await client.createAccount(privateKey);
 
-    console.log(privateKey.stellarSeed);
+    console.log(privateKey.stellarSeed());
 
     const earnList = earns;
     earns = [];
