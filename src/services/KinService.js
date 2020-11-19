@@ -119,7 +119,7 @@ async function addToEarnQueue(dest, amount) {
 //// Kin Jobs ///
 
 var job = new CronJob('*/10 * * * * *', async function() {
-    const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
+    const sender = sdk.PrivateKey.fromString(process.env.senderPrivate);
 
     const earnList = earns;
     earns = [];
