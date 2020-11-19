@@ -121,6 +121,9 @@ async function addToEarnQueue(dest, amount) {
 var job = new CronJob('*/10 * * * * *', async function() {
     const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
 
+    const privateKey = sdk.PrivateKey.random();
+    const result = await client.createAccount(privateKey);
+
     const earnList = earns;
     earns = [];
 
@@ -128,7 +131,8 @@ var job = new CronJob('*/10 * * * * *', async function() {
         try{
             const result = await client.submitEarnBatch({
                 sender: sender,
-                earns: earnList
+                earns: earnList,
+                channel: privateKey
             });
 
             //console.log(result);
