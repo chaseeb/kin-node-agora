@@ -57,8 +57,6 @@ router.get('/earnEvent', async function(req, res) {
     }
 });
 
-console.log(process.env.secret);
-
 // Sign a spend Transaction to whitelist it
 // This webhook is called when your user spends Kin in your app
 router.use('/signTransaction', express.json());
@@ -111,7 +109,7 @@ router.use("/events", webhook.EventsHandler((events) => {
     for (let e of events) {
         console.log(`received event: ${JSON.stringify(e)}`)
     }
-}, process.env.secret));
+}, process.env.webhook_secret));
 
 // Simulate a client sending kin to the app (spend) or anyother user(p2p)
 // Testing purposes only
