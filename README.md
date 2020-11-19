@@ -8,7 +8,7 @@ Setup:
 
 - Clone the repo
 - run "npm install" in your local directory
-- update the .env file with the recommended variables (TODO)
+- update the .env in /src with your whitelisted key, appindex, and webhook secret
 
 Start:
 
