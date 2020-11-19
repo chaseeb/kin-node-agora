@@ -80,13 +80,13 @@ async function earnEvent(dest, amount) {
 async function sendKin(senderPrivate, destPublic, amount) { 
 
     try{
-        const sender = sdk.PrivateKey.fromString(process.env.senderPrivate);
-        const dest = sdk.PublicKey.fromString('GDNJRI53DAO63JXQE2COPUDE3B3B6V5GGIIGE5QE4VZQZ5S2EHXHMZ6E');
+        const sender = sdk.PrivateKey.fromString(senderPrivate);
+        const dest = sdk.PublicKey.fromString(destPublic);
 
         let txHash = await client.submitPayment({
             sender: sender,
             destination: dest,
-            quarks: sdk.kinToQuarks(1),
+            quarks: sdk.kinToQuarks(amount),
             type: sdk.TransactionType.Spend
         });
 
