@@ -48,7 +48,7 @@ router.get('/getTransaction', async function(req, res) {
 // Add to earn queue if valid earn (type, amount, etc)
 router.get('/earnEvent', async function(req, res) {
     try{
-        const result = await KinService.addToEarnQueue(req.body.dest, req.body.amount);
+        const result = await KinService.earnEvent(req.body.dest, req.body.amount);
         return res.sendStatus(result);
     }
     catch(e){

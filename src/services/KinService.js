@@ -130,10 +130,12 @@ var job = new CronJob('*/10 * * * * *', async function() {
                 sender: sender,
                 earns: earnList
             });
-    
-            console.log(result.succeeded[0].txHash.toString('hex'));
 
-            return result.succeeded[0].txHash.toString('hex');
+            //console.log(result);
+    
+            console.log(result.succeeded[0].txId.toString('hex'));
+
+            return result.succeeded[0].txId.toString('hex');
         }
         catch (e){
             console.log(e);
