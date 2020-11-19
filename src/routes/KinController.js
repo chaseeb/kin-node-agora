@@ -100,7 +100,7 @@ router.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Pr
     // Note: if we didn't sign or reject, then the transaction will still go through,
     //       but fees will be charged.
     resp.sign(whitelistKey);
-}, process.env.secret))
+}, process.env.webhook_secret))
 
 // Webhook to receive all transaction events that happen using your AppIndex
 // This is not required, but can be useful to track and store kin events happening in your app
