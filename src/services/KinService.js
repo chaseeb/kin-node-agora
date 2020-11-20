@@ -90,10 +90,12 @@ async function sendKin(senderPrivate, destPublic, amount) {
             type: sdk.TransactionType.Spend
         });
 
-        console.log(txHash.toString('hex'));
+        console.log('Send Kin Success: ' + txHash.toString('hex'));
+
         return txHash.toString('hex');
     }
     catch (e){
+        console.log('Send Kin Fail: ' + e)
         console.log(e);
     }
 }
@@ -119,31 +121,30 @@ async function addToEarnQueue(dest, amount) {
 //// Kin Jobs ///
 
 var job = new CronJob('*/10 * * * * *', async function() {
+
     const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
-
-    const privateKey = await sdk.PrivateKey.random();
-    const result = await client.createAccount(privateKey);
-
-    console.log(privateKey.stellarSeed());
 
     const earnList = earns;
     earns = [];
 
     if(earnList.length > 0){
         try{
+            
+            const privateKey = await sdk.PrivateKey.random();
+            await client.createAccount(privateKey);
+
             const result = await client.submitEarnBatch({
                 sender: sender,
                 earns: earnList,
                 channel: privateKey
             });
 
-            //console.log(result);
-    
-            console.log(result.succeeded[0].txId.toString('hex'));
+            console.log('Earn Batch Success: ' + result.succeeded[0].txId.toString('hex'));
 
             return result.succeeded[0].txId.toString('hex');
         }
         catch (e){
+            console.log('Earn Batch Fail: ' + e);
             console.log(e);
         }
     }
