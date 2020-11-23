@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
+
 const KinService = require('../services/KinService');
 const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const sdk = require('@kinecosystem/kin-sdk-v2');
-const bodyParser = require('body-parser');
+
 const dotenv = require('dotenv').config();
+const bodyParser = require('body-parser');
 
 router.use(bodyParser.json());
 
@@ -61,7 +63,7 @@ router.get('/earnEvent', async function(req, res) {
 // This webhook is called when your user spends Kin in your app
 router.use('/signTransaction', express.json());
 router.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Prod, (req, resp) => {
-    console.log(`sign request for txID '${req.txHash().toString('hex')}`);
+    console.log(`sign request for txID '${req.txId().toString('hex')}`);
 
     const whitelistKey = sdk.PrivateKey.fromString(process.env.prodPrivate);
 

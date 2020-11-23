@@ -119,6 +119,19 @@ async function addToEarnQueue(dest, amount) {
 }
 
 //// Kin Jobs ///
+let availChannels = []
+createChannels();
+
+async function createChannels() { 
+
+    for(let i = 0; i < 10; i++){
+        const privateKey = sdk.PrivateKey.random();
+        client.createAccount(privateKey);
+        availChannels.push(privateKey);
+    }
+    console.log('Channels Created');
+
+}
 
 var job = new CronJob('*/10 * * * * *', async function() {
 
@@ -127,25 +140,33 @@ var job = new CronJob('*/10 * * * * *', async function() {
     const earnList = earns;
     earns = [];
 
+    let channel;
+
     if(earnList.length > 0){
         try{
-            
-            const privateKey = await sdk.PrivateKey.random();
-            await client.createAccount(privateKey);
+            channel = availChannels.pop();
+            console.log('Available Channels (pop):' + availChannels.length);
 
             const result = await client.submitEarnBatch({
                 sender: sender,
                 earns: earnList,
-                channel: privateKey
+                channel: channel
             });
 
-            console.log('Earn Batch Success: ' + result.succeeded[0].txId.toString('hex'));
+            availChannels.push(channel)
+            console.log('Available Channels (push):' + availChannels.length);
 
-            return result.succeeded[0].txId.toString('hex');
+            if(result.failed.length > 0){
+                console.log('Earn Batch Failed Tx: ' + result.failed);
+                //TODO: Handle Failure. Retry?
+            }
+            else{
+                console.log('Earn Batch Success: ' + result.succeeded[0].txId.toString('hex'))
+            }
         }
         catch (e){
-            console.log('Earn Batch Fail: ' + e);
-            console.log(e);
+            //TODO: push channel back to array if channel is less than the expected number of channels (won't work )
+            console.log('Earn Batch Error: ' + e);
         }
     }
 
