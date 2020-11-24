@@ -52,6 +52,10 @@ async function earnEvent(dest, amount) {
     //Do some checks to make sure this is legit user and transaction
     //These are just examples and should be specific to your app
 
+    // if(dest != 'GBADWYSILXOIKF7N7QGHPGXP64SFGRZX7T53OMWPU2FUCOEDFF7QJZBL'){
+    //     return 403;
+    // }
+
     if(!isMyUser){
         // log user data, ip and return (for later evaluation of fraud)
         return 403;
@@ -83,12 +87,19 @@ async function sendKin(senderPrivate, destPublic, amount) {
         const sender = sdk.PrivateKey.fromString(senderPrivate);
         const dest = sdk.PublicKey.fromString(destPublic);
 
+        channel = availChannels.pop();
+        console.log('Available Channels (pop):' + availChannels.length);
+
         let txHash = await client.submitPayment({
             sender: sender,
             destination: dest,
             quarks: sdk.kinToQuarks(amount),
-            type: sdk.TransactionType.Spend
+            type: sdk.TransactionType.Spend,
+            channel: channel
         });
+
+        availChannels.push(channel)
+        console.log('Available Channels (push):' + availChannels.length);
 
         console.log('Send Kin Success: ' + txHash.toString('hex'));
 
@@ -144,6 +155,8 @@ var job = new CronJob('*/10 * * * * *', async function() {
 
     if(earnList.length > 0){
         try{
+
+            //TODO: check if available channels, if not, create one
             channel = availChannels.pop();
             console.log('Available Channels (pop):' + availChannels.length);
 
@@ -157,8 +170,12 @@ var job = new CronJob('*/10 * * * * *', async function() {
             console.log('Available Channels (push):' + availChannels.length);
 
             if(result.failed.length > 0){
-                console.log('Earn Batch Failed Tx: ' + result.failed);
-                //TODO: Handle Failure. Retry?
+                console.log('Earn Batch Failed Tx:');
+                console.log(result.failed[0].earn);
+                // console.log(result.failed[0].error);
+
+                //TODO: handle failure, add back to earn queue
+                // if insuffienient balance, dev wallet needs refilled
             }
             else{
                 console.log('Earn Batch Success: ' + result.succeeded[0].txId.toString('hex'))
