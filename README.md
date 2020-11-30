@@ -11,7 +11,9 @@ Setup:
 - create a .env file in /src with your whitelisted key, appindex, and webhook secret
 
 prodPrivate='your whitelisted key here'
+
 appIndex=your app index here
+
 webhook_secret=your webhook secret here
 
 Start:
