@@ -4,6 +4,8 @@ API leveraging the Kin-Node SDK.
 
 This example Node API will show basic usage for creating accounts, submitting payments, submitting batch earns, checking balances, checking transacaction data and receiving Sign and Event webhook calls.
 
+In order to make full use of this project, you'll need to sign up at https://docs.google.com/forms/d/e/1FAIpQLSdz60FPmUB7qBq-TF7NNmRgM5W8wIqqL5oVHmMRbtBBXppv4Q/viewform . Within 24 hours you'll be provided an App Index and two follow-up forms. One form for test, and one for production. They give you the opportunity to provide your developer wallet for payment earns and signing transactions, as well as your webhooks and webhook secret.
+
 Setup:
 
 - Clone the repo
