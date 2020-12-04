@@ -171,11 +171,25 @@ var job = new CronJob('*/10 * * * * *', async function() {
 
             if(result.failed.length > 0){
                 console.log('Earn Batch Failed Tx:');
-                console.log(result.failed[0].earn);
-                // console.log(result.failed[0].error);
 
-                //TODO: handle failure, add back to earn queue
-                // if insuffienient balance, dev wallet needs refilled
+                for (let r of result.failed) {
+
+                    let retryDest = r.earn.destination.stellarAddress();
+                    let retryAmount = sdk.quarksToKin(r.earn.quarks);
+
+                    console.log('adding to earn queue for retry');
+                    addToEarnQueue(retryDest, retryAmount);
+
+                    // if destination does not exist, don't add back to queue
+                    ///if (result.failed[i].error){
+
+                    // // if insuffienient balance, dev wallet needs refilled
+                    // if(true){
+
+                    // }
+
+                }
+
             }
             else{
                 console.log('Earn Batch Success: ' + result.succeeded[0].txId.toString('hex'))
