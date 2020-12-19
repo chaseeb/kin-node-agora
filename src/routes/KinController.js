@@ -69,31 +69,31 @@ router.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Pr
 
     const whitelistKey = sdk.PrivateKey.fromString(process.env.prodPrivate);
 
-    // for (let i = 0; i < req.payments.length; i++) {
-    //     const p = req.payments[i];
+    for (let i = 0; i < req.payments.length; i++) {
+        const p = req.payments[i];
 
-    //     // Double check that the transaction isn't trying to impersonate us
-    //     // if (p.sender.equals(whitelistKey.publicKey())) {
-    //     //     resp.reject();
-    //     //     return;
-    //     // }
+        // Double check that the transaction isn't trying to impersonate us
+        // if (p.sender.equals(whitelistKey.publicKey())) {
+        //     resp.reject();
+        //     return;
+        // }
 
-    //     // In this example, we don't want to whitelist transactions that aren't sending
-    //     // kin to us.
-    //     // if (!p.destination.equals(whitelistKey.publicKey())) {
-    //     //     resp.markWrongDestination(i);
-    //     // }
+        // In this example, we don't want to whitelist transactions that aren't sending
+        // kin to us.
+        // if (!p.destination.equals(whitelistKey.publicKey())) {
+        //     resp.markWrongDestination(i);
+        // }
 
-    //     if (p.invoice) {
-    //         for (let item of p.invoice.Items) {
-    //             if (!item.sku) {
-    //                 // Note: in general the sku is optional. However, in this example we
-    //                 //       mark it as SkuNotFound to facilitate testing.
-    //                 resp.markSkuNotFound(i);
-    //             }
-    //         }
-    //     }
-    // }
+        if (p.invoice) {
+            for (let item of p.invoice.Items) {
+                if (!item.sku) {
+                    // Note: in general the sku is optional. However, in this example we
+                    //       mark it as SkuNotFound to facilitate testing.
+                    resp.markSkuNotFound(i);
+                }
+            }
+        }
+    }
 
     // Note: if we _don't_ do this check here, the SDK won't send back a signed
     //       transaction if this is set.
