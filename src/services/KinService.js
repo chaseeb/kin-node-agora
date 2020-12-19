@@ -5,8 +5,25 @@ const CronJob = require('cron').CronJob;
 //initialize the Client with the environment, appIndex, whitlist secret key or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
     appIndex: process.env.appIndex,
-    whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate)
+    //whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
+    kinVersion:4
   });
+
+//   async function massSend() { 
+
+//     let list = ['']
+
+//     for(let i of list){
+//         earns.push(        
+//             {
+//                 destination: sdk.PublicKey.fromString(i),
+//                 quarks: sdk.kinToQuarks(1),
+//                 type: sdk.TransactionType.Earn
+//             }
+//         )
+//     }
+
+// }
 
 //generate new random private key
 //use private key to create account
@@ -23,9 +40,10 @@ async function createAccount() {
 async function getBalance(publicAddress) { 
 
     const publicKey = sdk.PublicKey.fromString(publicAddress);
+
     const balance = await client.getBalance(publicKey);
 
-    return {balance: balance.toNumber()};
+    return {balance: sdk.quarksToKin(balance)};
 
 }
 
@@ -114,6 +132,18 @@ async function sendKin(senderPrivate, destPublic, amount) {
 //earn queue (not meant for production, will not save state on server crash)
 let earns = [];
 
+// massSend();
+
+//returns global earns (clojure?)
+//can't keep using the global variable
+//or maybe i can since it's only available to this js file?
+
+// async function earns() { 
+
+
+
+// }
+
 //
 async function addToEarnQueue(dest, amount) { 
 
@@ -129,21 +159,6 @@ async function addToEarnQueue(dest, amount) {
     
 }
 
-//// Kin Jobs ///
-let availChannels = []
-createChannels();
-
-async function createChannels() { 
-
-    for(let i = 0; i < 10; i++){
-        const privateKey = sdk.PrivateKey.random();
-        client.createAccount(privateKey);
-        availChannels.push(privateKey);
-    }
-    console.log('Channels Created');
-
-}
-
 var job = new CronJob('*/10 * * * * *', async function() {
 
     const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
@@ -151,23 +166,28 @@ var job = new CronJob('*/10 * * * * *', async function() {
     const earnList = earns;
     earns = [];
 
-    let channel;
+    //let channel;
 
     if(earnList.length > 0){
         try{
 
             //TODO: check if available channels, if not, create one
-            channel = availChannels.pop();
-            console.log('Available Channels (pop):' + availChannels.length);
+            //channel = availChannels.pop();
+            //console.log('Available Channels (pop):' + availChannels.length);
+
+            console.log('start submit');
 
             const result = await client.submitEarnBatch({
                 sender: sender,
                 earns: earnList,
-                channel: channel
+                memo: 'buy the ticket, take the ride'
+                //channel: channel
             });
 
-            availChannels.push(channel)
-            console.log('Available Channels (push):' + availChannels.length);
+            console.log('end submit');
+
+            //availChannels.push(channel)
+            //console.log('Available Channels (push):' + availChannels.length);
 
             if(result.failed.length > 0){
                 console.log('Earn Batch Failed Tx:');
@@ -179,6 +199,8 @@ var job = new CronJob('*/10 * * * * *', async function() {
 
                     console.log('adding to earn queue for retry');
                     addToEarnQueue(retryDest, retryAmount);
+
+                    console.log(result.failed[0].error);
 
                     // if destination does not exist, don't add back to queue
                     ///if (result.failed[i].error){
@@ -204,6 +226,22 @@ var job = new CronJob('*/10 * * * * *', async function() {
 }, null, true, 'America/Los_Angeles');
 job.start();
 
+//pay kin to random wallets
+//make people come to site/submit once per day to get engagement 
+//once they start coming back find a way to monetize
+// let payRandomKin = new CronJob('*/10 * * * * *', async function() {
+
+//     try{
+
+
+//     }
+//     catch (e){
+
+//     }
+
+// }, null, true, 'America/Los_Angeles');
+// payRandomKin.start();
+
 module.exports = {
     createAccount,
     getTransaction,
@@ -211,3 +249,20 @@ module.exports = {
     sendKin,
     earnEvent
 }
+
+
+
+//// Kin Jobs ///
+// let availChannels = []
+// //createChannels();
+
+// async function createChannels() { 
+
+//     for(let i = 0; i < 10; i++){
+//         const privateKey = sdk.PrivateKey.random();
+//         client.createAccount(privateKey);
+//         availChannels.push(privateKey);
+//     }
+//     console.log('Channels Created');
+
+// }

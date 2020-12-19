@@ -26,11 +26,13 @@ router.get('/createAccount', async function(req, res) {
 // Get Balance of user by Public Address
 router.get('/getBalance', async function(req, res) {
     try{
+        console.log('get balance');
         const result = await KinService.getBalance(req.body.publicAddress);
         return res.status(200).json(result);
     }
     catch(e){
         console.log(e);
+        res.status(500).json({error: "Get Balance Failure"});
     }
 });
 
