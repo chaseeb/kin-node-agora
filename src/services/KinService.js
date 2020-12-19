@@ -5,7 +5,7 @@ const CronJob = require('cron').CronJob;
 //initialize the Client with the environment, appIndex, whitlist secret key or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
     appIndex: process.env.appIndex,
-    //whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
+    whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
     kinVersion:4
   });
 
@@ -105,19 +105,19 @@ async function sendKin(senderPrivate, destPublic, amount) {
         const sender = sdk.PrivateKey.fromString(senderPrivate);
         const dest = sdk.PublicKey.fromString(destPublic);
 
-        channel = availChannels.pop();
-        console.log('Available Channels (pop):' + availChannels.length);
+        // channel = availChannels.pop();
+        // console.log('Available Channels (pop):' + availChannels.length);
 
         let txHash = await client.submitPayment({
             sender: sender,
             destination: dest,
             quarks: sdk.kinToQuarks(amount),
             type: sdk.TransactionType.Spend,
-            channel: channel
+           // channel: channel
         });
 
-        availChannels.push(channel)
-        console.log('Available Channels (push):' + availChannels.length);
+        //availChannels.push(channel)
+        //console.log('Available Channels (push):' + availChannels.length);
 
         console.log('Send Kin Success: ' + txHash.toString('hex'));
 

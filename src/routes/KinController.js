@@ -73,10 +73,10 @@ router.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Pr
         const p = req.payments[i];
 
         // Double check that the transaction isn't trying to impersonate us
-        if (p.sender.equals(whitelistKey.publicKey())) {
-            resp.reject();
-            return;
-        }
+        // if (p.sender.equals(whitelistKey.publicKey())) {
+        //     resp.reject();
+        //     return;
+        // }
 
         // In this example, we don't want to whitelist transactions that aren't sending
         // kin to us.
