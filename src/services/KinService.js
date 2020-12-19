@@ -5,7 +5,7 @@ const CronJob = require('cron').CronJob;
 //initialize the Client with the environment, appIndex, whitlist secret key or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
     appIndex: process.env.appIndex,
-    whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
+    //whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
     kinVersion:4
   });
 
@@ -102,8 +102,8 @@ async function earnEvent(dest, amount) {
 async function sendKin(senderPrivate, destPublic, amount) { 
 
     try{
-        const sender = sdk.PrivateKey.fromString(senderPrivate);
-        const dest = sdk.PublicKey.fromString(destPublic);
+        const sender = sdk.PrivateKey.fromString('SARHKKMQIWAZ4NREONWU2P2OCUABJWC5NSPVADQGRMTR7TQ47T6WWVDL');
+        const dest = sdk.PublicKey.fromString('GDU5QY6IQ6JGRSTYDH4IORINQM3SBVRU534QIF44LLIG2KCYIXWIEKQY');
 
         // channel = availChannels.pop();
         // console.log('Available Channels (pop):' + availChannels.length);
@@ -111,8 +111,8 @@ async function sendKin(senderPrivate, destPublic, amount) {
         let txHash = await client.submitPayment({
             sender: sender,
             destination: dest,
-            quarks: sdk.kinToQuarks(amount),
-            type: sdk.TransactionType.Spend,
+            quarks: sdk.kinToQuarks(1),
+            type: sdk.TransactionType.Spend
            // channel: channel
         });
 
