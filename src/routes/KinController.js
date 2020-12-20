@@ -73,16 +73,16 @@ router.use("/signTransaction", webhook.SignTransactionHandler(sdk.Environment.Pr
         const p = req.payments[i];
 
         // Double check that the transaction isn't trying to impersonate us
-        // if (p.sender.equals(whitelistKey.publicKey())) {
-        //     resp.reject();
-        //     return;
-        // }
+        if (p.sender.equals(whitelistKey.publicKey())) {
+            resp.reject();
+            return;
+        }
 
         // In this example, we don't want to whitelist transactions that aren't sending
         // kin to us.
-        // if (!p.destination.equals(whitelistKey.publicKey())) {
-        //     resp.markWrongDestination(i);
-        // }
+        if (!p.destination.equals(whitelistKey.publicKey())) {
+            resp.markWrongDestination(i);
+        }
 
         if (p.invoice) {
             for (let item of p.invoice.Items) {
@@ -119,13 +119,9 @@ router.use("/events", webhook.EventsHandler((events) => {
 // Testing purposes only
 router.get('/sendKin', async function(req, res) {
 
-console.log(req.body.sender);
-console.log(req.body.dest);
-console.log(req.body.amount);
-
     try{
         const result = await KinService.sendKin(req.body.sender, req.body.dest, req.body.amount);
-        //return res.json({txHash:result});
+        return res.json({txHash:result});
     }
     catch(e){
         console.log(e);

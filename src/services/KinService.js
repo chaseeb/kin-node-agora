@@ -9,22 +9,6 @@ const client = new sdk.Client(sdk.Environment.Prod, {
     kinVersion:4
   });
 
-//   async function massSend() { 
-
-//     let list = ['']
-
-//     for(let i of list){
-//         earns.push(        
-//             {
-//                 destination: sdk.PublicKey.fromString(i),
-//                 quarks: sdk.kinToQuarks(1),
-//                 type: sdk.TransactionType.Earn
-//             }
-//         )
-//     }
-
-// }
-
 //generate new random private key
 //use private key to create account
 async function createAccount() { 
@@ -102,22 +86,15 @@ async function earnEvent(dest, amount) {
 async function sendKin(senderPrivate, destPublic, amount) { 
 
     try{
-        const sender = sdk.PrivateKey.fromString('SARHKKMQIWAZ4NREONWU2P2OCUABJWC5NSPVADQGRMTR7TQ47T6WWVDL');
-        const dest = sdk.PublicKey.fromString('GDU5QY6IQ6JGRSTYDH4IORINQM3SBVRU534QIF44LLIG2KCYIXWIEKQY');
-
-        // channel = availChannels.pop();
-        // console.log('Available Channels (pop):' + availChannels.length);
+        const sender = sdk.PrivateKey.fromString(senderPrivate);
+        const dest = sdk.PublicKey.fromString(destPublic);
 
         let txHash = await client.submitPayment({
             sender: sender,
             destination: dest,
-            quarks: sdk.kinToQuarks(1),
-            type: sdk.TransactionType.Spend
-           // channel: channel
+            quarks: sdk.kinToQuarks(amount),
+            type: sdk.TransactionType.Spend,
         });
-
-        //availChannels.push(channel)
-        //console.log('Available Channels (push):' + availChannels.length);
 
         console.log('Send Kin Success: ' + txHash.toString('hex'));
 
@@ -132,8 +109,6 @@ async function sendKin(senderPrivate, destPublic, amount) {
 //earn queue (not meant for production, will not save state on server crash)
 let earns = [];
 
-// massSend();
-
 //returns global earns (clojure?)
 //can't keep using the global variable
 //or maybe i can since it's only available to this js file?
@@ -144,7 +119,7 @@ let earns = [];
 
 // }
 
-//
+// Add to earn Queue
 async function addToEarnQueue(dest, amount) { 
 
     earns.push(        
@@ -166,14 +141,8 @@ var job = new CronJob('*/10 * * * * *', async function() {
     const earnList = earns;
     earns = [];
 
-    //let channel;
-
     if(earnList.length > 0){
         try{
-
-            //TODO: check if available channels, if not, create one
-            //channel = availChannels.pop();
-            //console.log('Available Channels (pop):' + availChannels.length);
 
             console.log('start submit');
 
@@ -181,13 +150,9 @@ var job = new CronJob('*/10 * * * * *', async function() {
                 sender: sender,
                 earns: earnList,
                 memo: 'buy the ticket, take the ride'
-                //channel: channel
             });
 
             console.log('end submit');
-
-            //availChannels.push(channel)
-            //console.log('Available Channels (push):' + availChannels.length);
 
             if(result.failed.length > 0){
                 console.log('Earn Batch Failed Tx:');
@@ -218,29 +183,12 @@ var job = new CronJob('*/10 * * * * *', async function() {
             }
         }
         catch (e){
-            //TODO: push channel back to array if channel is less than the expected number of channels (won't work )
             console.log('Earn Batch Error: ' + e);
         }
     }
 
 }, null, true, 'America/Los_Angeles');
 job.start();
-
-//pay kin to random wallets
-//make people come to site/submit once per day to get engagement 
-//once they start coming back find a way to monetize
-// let payRandomKin = new CronJob('*/10 * * * * *', async function() {
-
-//     try{
-
-
-//     }
-//     catch (e){
-
-//     }
-
-// }, null, true, 'America/Los_Angeles');
-// payRandomKin.start();
 
 module.exports = {
     createAccount,
@@ -250,6 +198,24 @@ module.exports = {
     earnEvent
 }
 
+
+//   async function massSend() { 
+
+//     let list = ['']
+
+//     for(let i of list){
+//         earns.push(        
+//             {
+//                 destination: sdk.PublicKey.fromString(i),
+//                 quarks: sdk.kinToQuarks(1),
+//                 type: sdk.TransactionType.Earn
+//             }
+//         )
+//     }
+
+// }
+
+// massSend();
 
 
 //// Kin Jobs ///
@@ -266,3 +232,19 @@ module.exports = {
 //     console.log('Channels Created');
 
 // }
+
+//pay kin to random wallets
+//make people come to site/submit once per day to get engagement 
+//once they start coming back find a way to monetize
+// let payRandomKin = new CronJob('*/10 * * * * *', async function() {
+
+//     try{
+
+
+//     }
+//     catch (e){
+
+//     }
+
+// }, null, true, 'America/Los_Angeles');
+// payRandomKin.start();
