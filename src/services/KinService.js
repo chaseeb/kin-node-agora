@@ -1,6 +1,7 @@
 const sdk = require('@kinecosystem/kin-sdk-v2');
 const dotenv = require('dotenv').config();
 const CronJob = require('cron').CronJob;
+const axios = require('axios');
 
 //initialize the Client with the environment, appIndex, whitlist secret key or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
@@ -23,11 +24,27 @@ async function createAccount() {
 //get balance of account using the public key 
 async function getBalance(publicAddress) { 
 
+    // const publicKey = sdk.PublicKey.fromString(publicAddress);
+
+    // // let resolved = await client.resolveTokenAccounts(publicKey);
+    // // console.log(Buffer.from(resolved).toString('hex'));
+
+    // const balance = await client.getBalance(publicKey);
+
+    // console.log('got balnace');
+
+    // return {balance: sdk.quarksToKin(balance)};
+
+
     const publicKey = sdk.PublicKey.fromString(publicAddress);
-
     const balance = await client.getBalance(publicKey);
-
-    return {balance: sdk.quarksToKin(balance)};
+  
+    const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
+    const kinPrice = response.data.data.prices.latest;
+  
+    const usdBalance = sdk.quarksToKin(balance) * kinPrice;
+  
+    return {KIN_BALANCE: parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),  USD_BALANCE: '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")};
 
 }
 
@@ -154,18 +171,20 @@ var job = new CronJob('*/10 * * * * *', async function() {
 
             console.log('end submit');
 
-            if(result.failed.length > 0){
-                console.log('Earn Batch Failed Tx:');
+            console.log(result);
 
-                for (let r of result.failed) {
+            // if(result.txError){
+            //     console.log('Earn Batch Failed Tx:');
 
-                    let retryDest = r.earn.destination.stellarAddress();
-                    let retryAmount = sdk.quarksToKin(r.earn.quarks);
+                // for (let r of result.failed) {
 
-                    console.log('adding to earn queue for retry');
-                    addToEarnQueue(retryDest, retryAmount);
+                //     let retryDest = r.earn.destination.stellarAddress();
+                //     let retryAmount = sdk.quarksToKin(r.earn.quarks);
 
-                    console.log(result.failed[0].error);
+                //     console.log('adding to earn queue for retry');
+                //     addToEarnQueue(retryDest, retryAmount);
+
+                //     console.log(result.failed[0].error);
 
                     // if destination does not exist, don't add back to queue
                     ///if (result.failed[i].error){
@@ -175,12 +194,12 @@ var job = new CronJob('*/10 * * * * *', async function() {
 
                     // }
 
-                }
+                // }
 
-            }
-            else{
-                console.log('Earn Batch Success: ' + result.succeeded[0].txId.toString('hex'))
-            }
+            // }
+            // else{
+                //console.log('Earn Batch Success: ' + result.txId.toString('hex'))
+            // }
         }
         catch (e){
             console.log('Earn Batch Error: ' + e);

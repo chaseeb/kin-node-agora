@@ -8,9 +8,9 @@ const server = app.listen(port, function() {
   console.log('Express server listening on port ' + port);
 });
 
-process.on('uncaughtException', function(err) {
-  console.log('Caught exception: ' + err);
-});
+// process.on('uncaughtException', function(err) {
+//   console.log('Caught exception: ' + err);
+// });
 
 const KinController = require('./routes/KinController');
 app.use('/api/kin', KinController);

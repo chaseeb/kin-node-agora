@@ -28,6 +28,7 @@ router.get('/getBalance', async function(req, res) {
     try{
         console.log('get balance');
         const result = await KinService.getBalance(req.body.publicAddress);
+        console.log(result);
         return res.status(200).json(result);
     }
     catch(e){

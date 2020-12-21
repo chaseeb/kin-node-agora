@@ -9,7 +9,8 @@
   "author": "Chase Barker",
   "license": "ISC",
   "dependencies": {
-    "@kinecosystem/kin-sdk-v2": "^0.3.9",
+    "@kinecosystem/kin-sdk-v2": "^0.3.10",
+    "axios": "^0.21.0",
     "cron": "^1.8.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1"
