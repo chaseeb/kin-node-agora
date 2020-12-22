@@ -6,7 +6,7 @@ const axios = require('axios');
 //initialize the Client with the environment, appIndex, whitlist secret key or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
     appIndex: process.env.appIndex,
-    //whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
+    whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
     kinVersion:4
   });
 
@@ -24,27 +24,17 @@ async function createAccount() {
 //get balance of account using the public key 
 async function getBalance(publicAddress) { 
 
-    // const publicKey = sdk.PublicKey.fromString(publicAddress);
-
-    // // let resolved = await client.resolveTokenAccounts(publicKey);
-    // // console.log(Buffer.from(resolved).toString('hex'));
-
-    // const balance = await client.getBalance(publicKey);
-
-    // console.log('got balnace');
-
-    // return {balance: sdk.quarksToKin(balance)};
-
-
     const publicKey = sdk.PublicKey.fromString(publicAddress);
     const balance = await client.getBalance(publicKey);
   
     const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
     const kinPrice = response.data.data.prices.latest;
-  
+
+    // const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
+    // const kinPrice = response.data.kin.usd;
     const usdBalance = sdk.quarksToKin(balance) * kinPrice;
   
-    return {KIN_BALANCE: parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),  USD_BALANCE: '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")};
+    return {KIN_PRICE: kinPrice, KIN_BALANCE: parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),  USD_BALANCE: '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")};
 
 }
 
@@ -52,9 +42,10 @@ async function getBalance(publicAddress) {
 async function getTransaction(txId) { 
 
     const txHash = Buffer.from(txId, "hex");
+    console.log('before');
     const transactionData = await client.getTransaction(txHash);
-
-    return transactionData
+    console.log('after');
+    return transactionData;
 
 }
 
@@ -102,9 +93,10 @@ async function earnEvent(dest, amount) {
 //send kin with using the senders private key and receivers public key
 async function sendKin(senderPrivate, destPublic, amount) { 
 
-    try{
         const sender = sdk.PrivateKey.fromString(senderPrivate);
         const dest = sdk.PublicKey.fromString(destPublic);
+
+        console.log('start submit')
 
         let txHash = await client.submitPayment({
             sender: sender,
@@ -116,11 +108,7 @@ async function sendKin(senderPrivate, destPublic, amount) {
         console.log('Send Kin Success: ' + txHash.toString('hex'));
 
         return txHash.toString('hex');
-    }
-    catch (e){
-        console.log('Send Kin Fail: ' + e)
-        console.log(e);
-    }
+    
 }
 
 //earn queue (not meant for production, will not save state on server crash)
@@ -161,15 +149,13 @@ var job = new CronJob('*/10 * * * * *', async function() {
     if(earnList.length > 0){
         try{
 
-            console.log('start submit');
+            console.log('Submitting Earn Batch:');
 
             const result = await client.submitEarnBatch({
                 sender: sender,
                 earns: earnList,
                 memo: 'buy the ticket, take the ride'
             });
-
-            console.log('end submit');
 
             console.log(result);
 
