@@ -32,11 +32,11 @@ async function getBalance(publicAddress) {
     console.log('Solana Account Address: ' + publicKey.toBase58());
     console.log('Kin Token Account: ' + kinTokenAccount[0].toBase58());
   
-    const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
-    const kinPrice = response.data.data.prices.latest;
+    // const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
+    // const kinPrice = response.data.data.prices.latest;
 
-    // const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
-    // const kinPrice = response.data.kin.usd;
+    const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
+    const kinPrice = response.data.kin.usd;
 
     const usdBalance = sdk.quarksToKin(balance) * kinPrice;
   
@@ -67,8 +67,10 @@ async function getAccountInfo(publicAddress) {
     const balance = await client.getBalance(publicKey);
     let kinTokenAccount = await client.resolveTokenAccounts(publicKey);
 
-    const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
-    const kinPrice = response.data.data.prices.latest;
+    // const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
+    // const kinPrice = response.data.data.prices.latest;
+    const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
+    const kinPrice = response.data.kin.usd;
 
     const usdBalance = sdk.quarksToKin(balance) * kinPrice;
 
