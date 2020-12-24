@@ -10,19 +10,6 @@ const bodyParser = require('body-parser');
 
 router.use(bodyParser.json());
 
-//TODO: return the current API
-router.get('/', async function(req, res) {
-    // try{
-    //     const result = await KinService.createAccount();
-    //     return res.status(200).json(result);
-    // }
-    // catch(e){
-    //     console.log(e);
-    //     res.status(500).json({error: "Account creation failure."});
-    // }
-    res.send('This is the API.')
-});
-
 // Create Kin Account
 // For server use only (channels), not for creating client user accounts
 router.get('/createAccount', async function(req, res) {

@@ -12,6 +12,19 @@ const server = app.listen(port, function() {
 //   console.log('Caught exception: ' + err);
 // });
 
+//TODO: return the current API
+app.get('/', async function(req, res) {
+  // try{
+  //     const result = await KinService.createAccount();
+  //     return res.status(200).json(result);
+  // }
+  // catch(e){
+  //     console.log(e);
+  //     res.status(500).json({error: "Account creation failure."});
+  // }
+  res.send('This is the API.')
+});
+
 const KinService = require('./services/KinService');
 app.get('/accountInfo/:publicAddress', async function(req, res) {
   try{
