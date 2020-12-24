@@ -72,8 +72,6 @@ async function getAccountInfo(publicAddress) {
 
     const usdBalance = sdk.quarksToKin(balance) * kinPrice;
 
-    https://explorer.solana.com/address/GZHTcMDMBN1ryshgsf8nd9QDYpMdX4eE6PCue5JmvwUg/tokens?display=detail
-
     accountInfo.KIN_BALANCE = parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     accountInfo.USD_BALANCE = '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     accountInfo.STELLAR_ADDRESS = publicAddress;
