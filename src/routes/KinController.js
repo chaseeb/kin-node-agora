@@ -40,13 +40,11 @@ router.get('/getBalance', async function(req, res) {
 // Get Transaction of user by TransactionId
 router.get('/getTransaction', async function(req, res) {
     try{
-        console.log('Getting Transaction...');
         const result = await KinService.getTransaction(req.body.txId);
         console.log(result);
         res.status(200).json(result);
     }
     catch(e){
-        console.log('TESTTTT');
         console.log(e);
         res.json({error: e});
     }
@@ -128,7 +126,8 @@ router.get('/sendKin', async function(req, res) {
         return res.json({txHash:result});
     }
     catch(e){
-        console.log('Send Kin Fail: ' + e);
+        console.log('Send Kin Fail:');
+        console.log(e);
         res.json({error: e});
     }
 

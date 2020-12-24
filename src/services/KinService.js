@@ -2,12 +2,15 @@ const sdk = require('@kinecosystem/kin-sdk-v2');
 const dotenv = require('dotenv').config();
 const CronJob = require('cron').CronJob;
 const axios = require('axios');
+const bs58 = require('bs58');
+const { default: Logger } = require('js-logger');
+const logger = require('js-logger');
 
 //initialize the Client with the environment, appIndex, whitlist secret key or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
     appIndex: process.env.appIndex,
     whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
-    kinVersion:4
+    kinVersion: 4
   });
 
 //generate new random private key
@@ -26,15 +29,20 @@ async function getBalance(publicAddress) {
 
     const publicKey = sdk.PublicKey.fromString(publicAddress);
     const balance = await client.getBalance(publicKey);
+    let kinTokenAccount = await client.resolveTokenAccounts(publicKey);
+
+    console.log('Solana Account Address: ' + publicKey.toBase58());
+    console.log('Kin Token Account: ' + kinTokenAccount[0].toBase58());
   
     const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
     const kinPrice = response.data.data.prices.latest;
 
     // const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
     // const kinPrice = response.data.kin.usd;
+
     const usdBalance = sdk.quarksToKin(balance) * kinPrice;
   
-    return {KIN_PRICE: kinPrice, KIN_BALANCE: parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),  USD_BALANCE: '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")};
+    return {KIN_PRICE: kinPrice, KIN_BALANCE: parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),  USD_BALANCE: '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), DATE: new Date()};
 
 }
 
@@ -42,10 +50,14 @@ async function getBalance(publicAddress) {
 async function getTransaction(txId) { 
 
     const txHash = Buffer.from(txId, "hex");
-    console.log('before');
-    const transactionData = await client.getTransaction(txHash);
-    console.log('after');
-    return transactionData;
+    console.log('Getting Transaction....');
+    let transactionData = await client.getTransaction(txHash);
+
+    console.log('Sender: ' + transactionData.payments[0].sender.toBase58());
+    console.log('Destination: ' + transactionData.payments[0].destination.toBase58());
+    console.log('Amount: ' + sdk.quarksToKin(transactionData.payments[0].quarks));
+
+    return {SENDER: transactionData.payments[0].sender.toBase58(), DEST: transactionData.payments[0].destination.toBase58(), AMOUNT: sdk.quarksToKin(transactionData.payments[0].quarks)};
 
 }
 
@@ -102,12 +114,20 @@ async function sendKin(senderPrivate, destPublic, amount) {
             sender: sender,
             destination: dest,
             quarks: sdk.kinToQuarks(amount),
-            type: sdk.TransactionType.Spend,
+            type: sdk.TransactionType.Spend
         });
 
-        console.log('Send Kin Success: ' + txHash.toString('hex'));
+        // let txHash = await client.submitPayment({
+        //     sender: sender,
+        //     destination: dest,
+        //     quarks: sdk.kinToQuarks(amount),
+        //     type: sdk.TransactionType.Spend
+        // }, sdk.Commitment.Single, sdk.AccountResolution.Preferred, sdk.AccountResolution.Exact);
 
-        return txHash.toString('hex');
+        console.log('Send Kin Success:');
+        console.log(bs58.encode(txHash));
+
+        return bs58.encode(txHash);
     
 }
 
@@ -150,14 +170,23 @@ var job = new CronJob('*/10 * * * * *', async function() {
         try{
 
             console.log('Submitting Earn Batch:');
-
+            console.log(new Date());
             const result = await client.submitEarnBatch({
                 sender: sender,
                 earns: earnList,
                 memo: 'buy the ticket, take the ride'
             });
+            console.log(new Date());
 
-            console.log(result);
+            console.log(bs58.encode(result.txId));
+
+            if(result.txError){
+                console.log(result.txError);
+            }
+
+            if(result.earnErrors){
+                console.log(result.earnErrors);
+            }
 
             // if(result.txError){
             //     console.log('Earn Batch Failed Tx:');
