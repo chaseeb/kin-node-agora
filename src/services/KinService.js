@@ -59,6 +59,28 @@ async function getTransaction(txId) {
 
 }
 
+async function getAccountInfo(publicAddress) {
+
+    let accountInfo = {}
+
+    const publicKey = sdk.PublicKey.fromString(publicAddress);
+    const balance = await client.getBalance(publicKey);
+    let kinTokenAccount = await client.resolveTokenAccounts(publicKey);
+
+    const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
+    const kinPrice = response.data.data.prices.latest;
+
+    const usdBalance = sdk.quarksToKin(balance) * kinPrice;
+
+    accountInfo.KIN_BALANCE = parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    accountInfo.USD_BALANCE = '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    accountInfo.STELLAR_ADDRESS = publicAddress;
+    accountInfo.SOLANA_ACCOUNT = publicKey.toBase58();
+    accountInfo.KIN_SPL_TOKEN_ACCOUNT = kinTokenAccount[0].toBase58();
+
+    return accountInfo;
+}
+
 //Validate the earn event
 //Add to queue if all checks pass
 async function earnEvent(dest, amount) { 
@@ -227,7 +249,8 @@ module.exports = {
     getTransaction,
     getBalance,
     sendKin,
-    earnEvent
+    earnEvent,
+    getAccountInfo
 }
 
 

@@ -13,4 +13,4 @@ const server = app.listen(port, function() {
 // });
 
 const KinController = require('./routes/KinController');
-app.use('/api/kin', KinController);
+app.use('/', KinController);

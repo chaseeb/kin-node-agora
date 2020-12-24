@@ -50,6 +50,19 @@ router.get('/getTransaction', async function(req, res) {
     }
 });
 
+
+router.get('/accountInfo/:publicAddress', async function(req, res) {
+    try{
+        const result = await KinService.getAccountInfo(req.params.publicAddress);
+        console.log(result);
+        res.status(200).json(result);
+    }
+    catch(e){
+        console.log(e);
+        res.json({error: e});
+    }
+});
+
 // Earn Event Triggered by User in App
 // Add to earn queue if valid earn (type, amount, etc)
 router.get('/earnEvent', async function(req, res) {
