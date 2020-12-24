@@ -3,8 +3,6 @@ const dotenv = require('dotenv').config();
 const CronJob = require('cron').CronJob;
 const axios = require('axios');
 const bs58 = require('bs58');
-const { default: Logger } = require('js-logger');
-const logger = require('js-logger');
 
 //initialize the Client with the environment, appIndex, whitlist secret key or any other configurations you wish you use
 const client = new sdk.Client(sdk.Environment.Prod, {
