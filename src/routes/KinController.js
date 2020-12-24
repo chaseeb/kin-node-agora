@@ -64,20 +64,20 @@ router.get('/getTransaction', async function(req, res) {
 });
 
 
-router.get('/accountInfo/:publicAddress', async function(req, res) {
-    try{
-        const result = await KinService.getAccountInfo(req.params.publicAddress);
-        console.log(result);
+// router.get('/accountInfo/:publicAddress', async function(req, res) {
+//     try{
+//         const result = await KinService.getAccountInfo(req.params.publicAddress);
+//         console.log(result);
 
-        res.header("Content-Type",'application/json');
-        res.send(JSON.stringify(result, null, 4));
-        //res.status(200).send(JSON.stringify(result));
-    }
-    catch(e){
-        console.log(e);
-        res.json({error: e});
-    }
-});
+//         res.header("Content-Type",'application/json');
+//         res.send(JSON.stringify(result, null, 4));
+//         //res.status(200).send(JSON.stringify(result));
+//     }
+//     catch(e){
+//         console.log(e);
+//         res.json({error: e});
+//     }
+// });
 
 // Earn Event Triggered by User in App
 // Add to earn queue if valid earn (type, amount, etc)
