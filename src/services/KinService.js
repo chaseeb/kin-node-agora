@@ -76,6 +76,7 @@ async function getAccountInfo(publicAddress) {
 
     accountInfo.KIN_BALANCE = parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     accountInfo.USD_BALANCE = '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    accountInfo.KIN_PRICE = kinPrice;
     accountInfo.STELLAR_ADDRESS = publicAddress;
     accountInfo.SOLANA_ACCOUNT = publicKey.toBase58();
     accountInfo.KIN_SPL_TOKEN_ACCOUNT = kinTokenAccount[0].toBase58();
