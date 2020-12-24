@@ -79,7 +79,8 @@ async function getAccountInfo(publicAddress) {
     accountInfo.STELLAR_ADDRESS = publicAddress;
     accountInfo.SOLANA_ACCOUNT = publicKey.toBase58();
     accountInfo.KIN_SPL_TOKEN_ACCOUNT = kinTokenAccount[0].toBase58();
-    accountInfo.KIN_TOKEN_URL = 'https://explorer.solana.com/address/' + kinTokenAccount[0].toBase58() + '/tokens?display=detail'
+    accountInfo.KIN_TOKEN_URL = 'https://explorer.solana.com/address/' + kinTokenAccount[0].toBase58() + '/tokens?display=detail';
+    accountInfo.DATE = new Date();
 
     return accountInfo;
 }
