@@ -72,11 +72,11 @@ async function getAccountInfo(publicAddress) {
 
     const usdBalance = sdk.quarksToKin(balance) * kinPrice;
 
-    accountInfo.KIN_BALANCE = parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '<br/>';
-    accountInfo.USD_BALANCE = '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + '<br/>';
-    accountInfo.STELLAR_ADDRESS = publicAddress + '<br/>';
-    accountInfo.SOLANA_ACCOUNT = publicKey.toBase58() + '<br/>';
-    accountInfo.KIN_SPL_TOKEN_ACCOUNT = kinTokenAccount[0].toBase58() + '<br/>';
+    accountInfo.KIN_BALANCE = parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    accountInfo.USD_BALANCE = '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    accountInfo.STELLAR_ADDRESS = publicAddress;
+    accountInfo.SOLANA_ACCOUNT = publicKey.toBase58();
+    accountInfo.KIN_SPL_TOKEN_ACCOUNT = kinTokenAccount[0].toBase58();
 
     return accountInfo;
 }
