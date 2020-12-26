@@ -8,7 +8,8 @@ const bs58 = require('bs58');
 const client = new sdk.Client(sdk.Environment.Prod, {
     appIndex: process.env.appIndex,
     whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
-    kinVersion: 4
+    kinVersion: 4,
+    retryConfig: {maxRetries: 10, maxNonceRefreshes: 10}
   });
 
 //generate new random private key
@@ -257,54 +258,3 @@ module.exports = {
     earnEvent,
     getAccountInfo
 }
-
-
-//   async function massSend() { 
-
-//     let list = ['']
-
-//     for(let i of list){
-//         earns.push(        
-//             {
-//                 destination: sdk.PublicKey.fromString(i),
-//                 quarks: sdk.kinToQuarks(1),
-//                 type: sdk.TransactionType.Earn
-//             }
-//         )
-//     }
-
-// }
-
-// massSend();
-
-
-//// Kin Jobs ///
-// let availChannels = []
-// //createChannels();
-
-// async function createChannels() { 
-
-//     for(let i = 0; i < 10; i++){
-//         const privateKey = sdk.PrivateKey.random();
-//         client.createAccount(privateKey);
-//         availChannels.push(privateKey);
-//     }
-//     console.log('Channels Created');
-
-// }
-
-//pay kin to random wallets
-//make people come to site/submit once per day to get engagement 
-//once they start coming back find a way to monetize
-// let payRandomKin = new CronJob('*/10 * * * * *', async function() {
-
-//     try{
-
-
-//     }
-//     catch (e){
-
-//     }
-
-// }, null, true, 'America/Los_Angeles');
-// payRandomKin.start();
