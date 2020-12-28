@@ -102,6 +102,7 @@ async function getAccountInfo(publicAddress) {
 
     accountInfo.kinBalance = await getBalance(publicAddress);
     accountInfo.usdValue = await getUsdValue(publicAddress);
+    accountInfo.price = await getKinPrice();
     accountInfo.stellarAddress = publicAddress;
     accountInfo.solanaAddress = await getSolanaAddress(publicAddress);
     accountInfo.kinTokenAccount = await getKinTokenAccount(publicAddress);
