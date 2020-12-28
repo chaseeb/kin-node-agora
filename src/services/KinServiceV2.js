@@ -98,11 +98,15 @@ async function getAccountInfo(publicAddress) {
 
     let accountInfo = {};
 
+    //Todo:? for loop to simplify this?
+
     accountInfo.kinBalance = await getBalance(publicAddress);
     accountInfo.usdValue = await getUsdValue(publicAddress);
+    accountInfo.stellarAddress = publicAddress;
     accountInfo.solanaAddress = await getSolanaAddress(publicAddress);
     accountInfo.kinTokenAccount = await getKinTokenAccount(publicAddress);
     accountInfo.kinTokenAccountUrl = await getKinTokenAccountUrl(publicAddress);
+    accountInfo.date = new Date();
     accountInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
 
     return accountInfo;

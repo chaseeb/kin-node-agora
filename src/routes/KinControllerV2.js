@@ -98,7 +98,9 @@ router.get('/kinTokenAccountUrl/:publicAddress', async function(req, res) {
 router.get('/accountInfo/:publicAddress', async function(req, res) {
     try{
         const result = await KinServiceV2.getAccountInfo(req.params.publicAddress);
-        return res.status(200).json(result);
+        res.header("Content-Type",'application/json');
+        res.send(JSON.stringify(result, null, 4));
+        //return res.status(200).json(result);
     }
     catch(e){
         console.log(e);
