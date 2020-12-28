@@ -19,15 +19,17 @@ async function createAccount() {
     const privateKey = sdk.PrivateKey.random();
     const result = await client.createAccount(privateKey);
 
-    return({public:privateKey.publicKey().stellarAddress(), private:privateKey.stellarSeed()});
+    return{public:privateKey.publicKey().stellarAddress(), private:privateKey.stellarSeed()};
 
 }
 
 //get balance of account using the public key 
 async function getBalance(publicAddress) { 
-
+    console.log(publicAddress);
     const publicKey = sdk.PublicKey.fromString(publicAddress);
+    console.log('test2');
     const balance = await client.getBalance(publicKey);
+    console.log('test3');
     let kinTokenAccount = await client.resolveTokenAccounts(publicKey);
 
     console.log('Solana Account Address: ' + publicKey.toBase58());
@@ -131,29 +133,29 @@ async function earnEvent(dest, amount) {
 //send kin with using the senders private key and receivers public key
 async function sendKin(senderPrivate, destPublic, amount) { 
 
-        const sender = sdk.PrivateKey.fromString(senderPrivate);
-        const dest = sdk.PublicKey.fromString(destPublic);
+    const sender = sdk.PrivateKey.fromString(senderPrivate);
+    const dest = sdk.PublicKey.fromString(destPublic);
 
-        console.log('start submit')
+    console.log('start submit')
 
-        let txHash = await client.submitPayment({
-            sender: sender,
-            destination: dest,
-            quarks: sdk.kinToQuarks(amount),
-            type: sdk.TransactionType.Spend
-        });
+    let txHash = await client.submitPayment({
+        sender: sender,
+        destination: dest,
+        quarks: sdk.kinToQuarks(amount),
+        type: sdk.TransactionType.Spend
+    });
 
-        // let txHash = await client.submitPayment({
-        //     sender: sender,
-        //     destination: dest,
-        //     quarks: sdk.kinToQuarks(amount),
-        //     type: sdk.TransactionType.Spend
-        // }, sdk.Commitment.Single, sdk.AccountResolution.Preferred, sdk.AccountResolution.Exact);
+    // let txHash = await client.submitPayment({
+    //     sender: sender,
+    //     destination: dest,
+    //     quarks: sdk.kinToQuarks(amount),
+    //     type: sdk.TransactionType.Spend
+    // }, sdk.Commitment.Single, sdk.AccountResolution.Preferred, sdk.AccountResolution.Exact);
 
-        console.log('Send Kin Success:');
-        console.log(bs58.encode(txHash));
+    console.log('Send Kin Success:');
+    console.log(bs58.encode(txHash));
 
-        return bs58.encode(txHash);
+    return bs58.encode(txHash);
     
 }
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const KinService = require('../services/KinService');
+const KinServiceV2 = require('../services/KinServiceV2');
 const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const sdk = require('@kinecosystem/kin-sdk-v2');
 
@@ -10,10 +10,10 @@ const bodyParser = require('body-parser');
 
 router.use(bodyParser.json());
 
-// Create Kin Account
+// Create Account
 router.get('/createAccount', async function(req, res) {
     try{
-        const result = await KinService.createAccount();
+        const result = await KinServiceV2.createAccount();
         return res.status(200).json(result);
     }
     catch(e){
@@ -22,7 +22,7 @@ router.get('/createAccount', async function(req, res) {
     }
 });
 
-// Get Transaction of user by TransactionId
+// Get Transaction
 router.get('/transaction', async function(req, res) {
     try{
         const result = await KinService.getTransaction(req.parmas.txId);
@@ -34,10 +34,10 @@ router.get('/transaction', async function(req, res) {
     }
 });
 
-// Get Balance of user by Stellar Address
+// Get Balance
 router.get('/balance/:publicAddress', async function(req, res) {
     try{
-        const result = await KinService.getBalance(req.params.publicAddress);
+        const result = await KinServiceV2.getBalance(req.params.publicAddress);
         return res.status(200).json(result);
     }
     catch(e){
@@ -47,10 +47,10 @@ router.get('/balance/:publicAddress', async function(req, res) {
 });
 
 // Get USD Value of Account
-router.get('/usdValue', async function(req, res) {
+router.get('/usdValue/:publicAddress', async function(req, res) {
     try{
-        //const result = await KinService.getBalance(req.body.publicAddress);
-        return res.status(200).json(result);
+        const result = await KinServiceV2.getUsdValue(req.params.publicAddress);
+        return res.status(200).json(parseFloat(result));
     }
     catch(e){
         console.log(e);
@@ -61,7 +61,7 @@ router.get('/usdValue', async function(req, res) {
 // Get Solana Account Address from Stellar Address
 router.get('/solanaAddress/:publicAddress', async function(req, res) {
     try{
-        //const result = await KinService.getBalance(req.body.publicAddress);
+        const result = await KinServiceV2.getSolanaAddress(req.body.publicAddress);
         return res.status(200).json(result);
     }
     catch(e){
@@ -73,7 +73,7 @@ router.get('/solanaAddress/:publicAddress', async function(req, res) {
 // Get Kin Token Account Address from Stellar Address
 router.get('/kinTokenAccount/:publicAddress', async function(req, res) {
     try{
-        //const result = await KinService.getBalance(req.body.publicAddress);
+        const result = await KinServiceV2.getKinTokenAccount(req.params.publicAddress);
         return res.status(200).json(result);
     }
     catch(e){
@@ -85,7 +85,7 @@ router.get('/kinTokenAccount/:publicAddress', async function(req, res) {
 // Get Kin Token Account Url from Stellar Address
 router.get('/kinTokenAccountUrl/:publicAddress', async function(req, res) {
     try{
-        //const result = await KinService.getBalance(req.body.publicAddress);
+        const result = await KinServiceV2.getKinTokenAccountUrl(req.params.publicAddress);
         return res.status(200).json(result);
     }
     catch(e){
@@ -97,7 +97,7 @@ router.get('/kinTokenAccountUrl/:publicAddress', async function(req, res) {
 // Get All Account Info for user from Stellar Address
 router.get('/accountInfo/:publicAddress', async function(req, res) {
     try{
-        //const result = await KinService.getBalance(req.body.publicAddress);
+        const result = await KinServiceV2.getAccountInfo(req.params.publicAddress);
         return res.status(200).json(result);
     }
     catch(e){
@@ -109,7 +109,7 @@ router.get('/accountInfo/:publicAddress', async function(req, res) {
 // Get Kin Token Rank from CMC
 router.get('/rank', async function(req, res) {
     try{
-        //const result = await KinService.getBalance(req.body.publicAddress);
+        const result = await KinService.getKinRank();
         return res.status(200).json(result);
     }
     catch(e){
@@ -121,7 +121,7 @@ router.get('/rank', async function(req, res) {
 // Get Kin Token Price
 router.get('/price', async function(req, res) {
     try{
-        //const result = await KinService.getBalance(req.body.publicAddress);
+        const result = await KinServiceV2.getKinPrice();
         return res.status(200).json(result);
     }
     catch(e){
@@ -130,15 +130,37 @@ router.get('/price', async function(req, res) {
     }
 });
 
-// Get All Kin Token Info
-router.get('/kinInfo', async function(req, res) {
+router.get('/marketCap', async function(req, res) {
     try{
-        //const result = await KinService.getBalance(req.body.publicAddress);
+        const result = await KinService.getKinMarketCap();
         return res.status(200).json(result);
     }
     catch(e){
         console.log(e);
-        res.status(500).json({error: "Error USD Value"});
+        res.status(500).json({error: "Error Getting Market Cap"});
+    }
+});
+
+router.get('/circSupply', async function(req, res) {
+    try{
+        const result = await KinService.getKinCircSupply();
+        return res.status(200).json(result);
+    }
+    catch(e){
+        console.log(e);
+        res.status(500).json({error: "Error Getting Circulating Supply"});
+    }
+});
+
+// Get All Kin Token Info
+router.get('/kinInfo', async function(req, res) {
+    try{
+        const result = await KinServiceV2.getKinInfo();
+        return res.status(200).json(result);
+    }
+    catch(e){
+        console.log(e);
+        res.status(500).json({error: "Error Kin User Information"});
     }
 });
 
@@ -150,7 +172,7 @@ router.get('/earnEvent', async function(req, res) {
     }
     catch(e){
         console.log(e);
-        res.json({error: e});
+        res.json({error: 'Error Paying Earn'});
     }
 });
 
@@ -163,7 +185,7 @@ router.get('/sendKin', async function(req, res) {
     }
     catch(e){
         console.log(e);
-        res.json({error: 'Sending Kin Failed'});
+        res.json({error: 'Errror Sending Kin'});
     }
 
 });
@@ -223,6 +245,8 @@ router.use("/events", webhook.EventsHandler((events) => {
         console.log(`received event: ${JSON.stringify(e)}`)
     }
 }, process.env.webhook_secret));
+
+module.exports = router;
 
 //...........................................................
 

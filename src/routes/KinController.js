@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const KinService = require('../services/KinService');
+const KinService = require('../services/KinServiceV2');
 const webhook = require('@kinecosystem/kin-sdk-v2/dist/webhook');
 const sdk = require('@kinecosystem/kin-sdk-v2');
 

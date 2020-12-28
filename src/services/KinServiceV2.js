@@ -12,12 +12,20 @@ const client = new sdk.Client(sdk.Environment.Prod, {
     retryConfig: {maxRetries: 10, maxNonceRefreshes: 10}
   });
 
+  /**
+  * Create Account
+  * @return {JSON}      Keypair of newly created wallet
+  */
   async function createAccount() { 
 
     const privateKey = sdk.PrivateKey.random();
-    const result = await client.createAccount(privateKey);
+    await client.createAccount(privateKey);
 
-    return({public:privateKey.publicKey().stellarAddress(), private:privateKey.stellarSeed()});
+    let createdAccount = {};
+    createdAccount.public = privateKey.publicKey().stellarAddress();
+    createdAccount.private = privateKey.stellarSeed();
+
+    return createdAccount;
 
 }
 
@@ -25,14 +33,15 @@ const client = new sdk.Client(sdk.Environment.Prod, {
 async function getTransaction(txId) { 
 
     const txHash = Buffer.from(txId, "hex");
-    console.log('Getting Transaction....');
-    let transactionData = await client.getTransaction(txHash);
 
-    console.log('Sender: ' + transactionData.payments[0].sender.toBase58());
-    console.log('Destination: ' + transactionData.payments[0].destination.toBase58());
-    console.log('Amount: ' + sdk.quarksToKin(transactionData.payments[0].quarks));
+    let result = await client.getTransaction(txHash);
 
-    return {SENDER: transactionData.payments[0].sender.toBase58(), DEST: transactionData.payments[0].destination.toBase58(), AMOUNT: sdk.quarksToKin(transactionData.payments[0].quarks)};
+    let transactionData = {};
+    transactionData.sender = result.payments[0].sender.toBase58();
+    transactionData.destination = result.payments[0].destination.toBase58();
+    transactionData.amount = sdk.quarksToKin(result.payments[0].quarks);
+
+    return transactionData;
 
 }
 
@@ -40,58 +49,69 @@ async function getTransaction(txId) {
 async function getBalance(publicAddress) { 
 
     const publicKey = sdk.PublicKey.fromString(publicAddress);
-    const balance = await client.getBalance(publicKey);
-    let kinTokenAccount = await client.resolveTokenAccounts(publicKey);
 
-    console.log('Solana Account Address: ' + publicKey.toBase58());
-    console.log('Kin Token Account: ' + kinTokenAccount[0].toBase58());
+    let balance = await client.getBalance(publicKey);
+    balance = sdk.quarksToKin(balance);
+    //balance = parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   
-    // const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
-    // const kinPrice = response.data.data.prices.latest;
-
-    const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
-    const kinPrice = response.data.kin.usd;
-
-    const usdBalance = sdk.quarksToKin(balance) * kinPrice;
-  
-    return {KIN_PRICE: kinPrice, KIN_BALANCE: parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","),  USD_BALANCE: '$' + parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","), DATE: new Date()};
+    return balance;
 
 }
 
 async function getUsdValue(publicAddress) { 
 
-    const balance = getBalance(publicAddress);
-    const kinPrice = getKinPrice();
-    const usdBalance = sdk.quarksToKin(balance) * kinPrice;
-    return {balance: usdBalance}
+    const balance = await getBalance(publicAddress);
+    const kinPrice = await getKinPrice();
+    let usdBalance = balance * kinPrice;
+    //usdBalance = parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    
+    return usdBalance.toFixed(2);
 
 }
 
 async function getSolanaAddress(publicAddress) { 
 
     const publicKey = sdk.PublicKey.fromString(publicAddress);
-    return {solanaAddress: publicKey.toBase58()};
+    const solanaAddress = publicKey.toBase58();
 
+    return solanaAddress;
 }
 
 async function getKinTokenAccount(publicAddress) { 
 
     const publicKey = sdk.PublicKey.fromString(publicAddress);
-    const kinTokenAccount = await client.resolveTokenAccounts(publicKey);
-    return {kinTokenAccount: kinTokenAccount};
+    kinTokenAccount = await client.resolveTokenAccounts(publicKey);
+    kinTokenAccount = kinTokenAccount[0].toBase58();
+
+    return kinTokenAccount;
 
 }
 
 async function getKinTokenAccountUrl(publicAddress) { 
-    const kinTokenAccount = getKinTokenAccount(publicAddress)[0].toBase58();
-    return {kinTokenAccountUrl: 'https://explorer.solana.com/address/' + kinTokenAccount + '/tokens?display=detail'};
+
+    const kinTokenAccount = await getKinTokenAccount(publicAddress);
+    return 'https://explorer.solana.com/address/' + kinTokenAccount + '/tokens?display=detail';
+
 }
 
-async function getAccountInfo() { 
+async function getAccountInfo(publicAddress) { 
+
+    let accountInfo = {};
+
+    accountInfo.kinBalance = await getBalance(publicAddress);
+    accountInfo.usdValue = await getUsdValue(publicAddress);
+    accountInfo.solanaAddress = await getSolanaAddress(publicAddress);
+    accountInfo.kinTokenAccount = await getKinTokenAccount(publicAddress);
+    accountInfo.kinTokenAccountUrl = await getKinTokenAccountUrl(publicAddress);
+    accountInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
+
+    return accountInfo;
 
 }
 
 async function getKinRank() { 
+
+    return 1;
 
 }
 
@@ -102,12 +122,49 @@ async function getKinPrice() {
     
     const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
     const kinPrice = response.data.kin.usd;
+
+    return kinPrice;
+}
+
+async function getKinMarketCap() { 
+
+    //TODO: CoinMarketCap API
+
+    return '100 Million';
+
+}
+
+async function getKinCircSupply() { 
+
+    //TODO: Get Wallets
+
+    return '1.5 Trillion';
+
+}
+
+async function getKinTotalSupply() { 
+
+    //TODO: Add to controller
+
+    return '1.5 Trillion';
+
 }
 
 async function getKinInfo() { 
-    //kin rank
-    //kin price
-    //other stuff?
+    
+    //make sure all of these are added to controller
+
+    let kinInfo = {};
+    kinInfo.rank = await getKinRank();
+    kinInfo.price = await getKinPrice();
+    kinInfo.getKinMarketCap = await getKinMarketCap()
+    kinInfo.circulatingSupply = await getKinCircSupply();
+    kinInfo.totalSupply = await getKinTotalSupply();
+    kinInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
+
+    console.log(kinInfo);
+
+    return kinInfo;
 }
 
 //send kin with using the senders private key and receivers public key
@@ -141,6 +198,8 @@ async function sendKin(senderPrivate, destPublic, amount) {
 
 async function earnEvent() { 
 
+    //TODO: Use Kin Service V1
+
 }
 
 //Cron Job?
@@ -148,11 +207,21 @@ async function payRandom() {
 
 }
 
-// module.exports = {
-//     createAccount,
-//     getTransaction,
-//     getBalance,
-//     sendKin,
-//     earnEvent,
-//     getAccountInfo
-// }
+module.exports = {
+    createAccount,
+    getTransaction,
+    getBalance,
+    getUsdValue,
+    getSolanaAddress,
+    getKinTokenAccount,
+    getKinTokenAccountUrl,
+    getAccountInfo,
+    getKinRank,
+    getKinPrice,
+    getKinMarketCap,
+    getKinCircSupply,
+    getKinInfo,
+    sendKin,
+    earnEvent,
+    payRandom
+}
