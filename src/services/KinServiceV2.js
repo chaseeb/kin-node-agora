@@ -107,7 +107,7 @@ async function getAccountInfo(publicAddress) {
     accountInfo.kinTokenAccount = await getKinTokenAccount(publicAddress);
     accountInfo.kinTokenAccountUrl = await getKinTokenAccountUrl(publicAddress);
     accountInfo.date = new Date();
-    accountInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
+    //accountInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
 
     return accountInfo;
 
@@ -164,7 +164,8 @@ async function getKinInfo() {
     kinInfo.getKinMarketCap = await getKinMarketCap()
     kinInfo.circulatingSupply = await getKinCircSupply();
     kinInfo.totalSupply = await getKinTotalSupply();
-    kinInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
+    kinInfo.date = new Date();
+    //kinInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
 
     console.log(kinInfo);
 

@@ -158,7 +158,9 @@ router.get('/circSupply', async function(req, res) {
 router.get('/kinInfo', async function(req, res) {
     try{
         const result = await KinServiceV2.getKinInfo();
-        return res.status(200).json(result);
+        res.header("Content-Type",'application/json');
+        res.send(JSON.stringify(result, null, 4));
+        //return res.status(200).json(result);
     }
     catch(e){
         console.log(e);
