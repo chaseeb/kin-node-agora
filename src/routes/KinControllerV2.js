@@ -184,7 +184,7 @@ router.get('/earnEvent', async function(req, res) {
 router.get('/sendKin', async function(req, res) {
 
     try{
-        const result = await KinService.sendKin(req.body.sender, req.body.dest, req.body.amount);
+        const result = await KinServiceV2.sendKin(req.body.sender, req.body.dest, req.body.amount);
         return res.json({txHash:result});
     }
     catch(e){
