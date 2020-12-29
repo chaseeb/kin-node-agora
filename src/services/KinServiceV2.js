@@ -25,6 +25,8 @@ const client = new sdk.Client(sdk.Environment.Prod, {
     createdAccount.public = privateKey.publicKey().stellarAddress();
     createdAccount.private = privateKey.stellarSeed();
 
+    console.log('createdAccount', createAccount);
+
     return createdAccount;
 
 }
@@ -41,6 +43,8 @@ async function getTransaction(txId) {
     transactionData.destination = result.payments[0].destination.toBase58();
     transactionData.amount = sdk.quarksToKin(result.payments[0].quarks);
 
+    console.log('transactionData', transactionData);
+
     return transactionData;
 
 }
@@ -53,6 +57,8 @@ async function getBalance(publicAddress) {
     let balance = await client.getBalance(publicKey);
     balance = sdk.quarksToKin(balance);
     //balance = parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+    console.log('balance', balance);
   
     return balance;
 
@@ -65,6 +71,8 @@ async function getUsdValue(publicAddress) {
     let usdBalance = balance * kinPrice;
     //usdBalance = parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     
+    console.log('usdValue', usdBalance.toFixed(2));
+    
     return usdBalance.toFixed(2);
 
 }
@@ -73,6 +81,8 @@ async function getSolanaAddress(publicAddress) {
 
     const publicKey = sdk.PublicKey.fromString(publicAddress);
     const solanaAddress = publicKey.toBase58();
+
+    console.log('solanaAddress', solanaAddress);
 
     return solanaAddress;
 }
@@ -83,6 +93,8 @@ async function getKinTokenAccount(publicAddress) {
     kinTokenAccount = await client.resolveTokenAccounts(publicKey);
     kinTokenAccount = kinTokenAccount[0].toBase58();
 
+    console.log('kinTokenAccount', kinTokenAccount);
+
     return kinTokenAccount;
 
 }
@@ -90,6 +102,9 @@ async function getKinTokenAccount(publicAddress) {
 async function getKinTokenAccountUrl(publicAddress) { 
 
     const kinTokenAccount = await getKinTokenAccount(publicAddress);
+
+    console.log('kinTokenAccountUrl', 'https://explorer.solana.com/address/' + kinTokenAccount + '/tokens?display=detail');
+
     return 'https://explorer.solana.com/address/' + kinTokenAccount + '/tokens?display=detail';
 
 }
@@ -110,11 +125,15 @@ async function getAccountInfo(publicAddress) {
     accountInfo.date = new Date();
     //accountInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
 
+    console.log('account info', accountInfo);
+
     return accountInfo;
 
 }
 
 async function getKinRank() { 
+
+    console.log('rank', 1);
 
     return 1;
 
@@ -128,6 +147,8 @@ async function getKinPrice() {
     const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
     const kinPrice = response.data.kin.usd;
 
+    console.log('kin price', kinPrice);
+
     return kinPrice;
 }
 
@@ -135,7 +156,7 @@ async function getKinMarketCap() {
 
     //TODO: CoinMarketCap API
 
-    return '100 Million';
+    return '100,000,000';
 
 }
 
@@ -143,7 +164,9 @@ async function getKinCircSupply() {
 
     //TODO: Get Wallets
 
-    return '1.5 Trillion';
+    console.log('circSupply', '1,500,000,000,000');
+
+    return '1,500,000,000,000';
 
 }
 
@@ -151,7 +174,9 @@ async function getKinTotalSupply() {
 
     //TODO: Add to controller
 
-    return '1.5 Trillion';
+    console.log('totalSupply', '10,000,000,000,000');
+
+    return '10,000,000,000,000';
 
 }
 
