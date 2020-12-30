@@ -8,6 +8,7 @@ const server = app.listen(port, function() {
   console.log('Express server listening on port ' + port);
 });
 
+const ejs = require('ejs');
 app.set('view engine', 'ejs'); 
 
 // process.on('uncaughtException', function(err) {

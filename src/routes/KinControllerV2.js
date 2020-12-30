@@ -134,7 +134,7 @@ router.get('/price', async function(req, res) {
 
 router.get('/marketCap', async function(req, res) {
     try{
-        const result = await KinService.getKinMarketCap();
+        const result = await KinServiceV2.getKinMarketCap();
         return res.status(200).json(result);
     }
     catch(e){
@@ -145,7 +145,18 @@ router.get('/marketCap', async function(req, res) {
 
 router.get('/circSupply', async function(req, res) {
     try{
-        const result = await KinService.getKinCircSupply();
+        const result = await KinServiceV2.getKinCircSupply();
+        return res.status(200).json(result);
+    }
+    catch(e){
+        console.log(e);
+        res.status(500).json({error: "Error Getting Circulating Supply"});
+    }
+});
+
+router.get('/totalSupply', async function(req, res) {
+    try{
+        const result = await KinServiceV2.getKinCircSupply();
         return res.status(200).json(result);
     }
     catch(e){
@@ -171,7 +182,7 @@ router.get('/kinInfo', async function(req, res) {
 // Add Earn Event to Queue if Valid
 router.get('/earnEvent', async function(req, res) {
     try{
-        const result = await KinService.earnEvent(req.body.dest, req.body.amount);
+        const result = await KinServiceV2.earnEvent(req.body.dest, req.body.amount);
         return res.sendStatus(result);
     }
     catch(e){
