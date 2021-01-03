@@ -229,16 +229,135 @@ async function sendKin(senderPrivate, destPublic, amount) {
 
 }
 
-async function earnEvent() { 
+//Validate the earn event
+//Add to queue if all checks pass
+async function earnEvent(dest, amount) { 
 
-    //TODO: Use Kin Service V1
+    //test data
+    let isMyUser = true;
+    let validAmount = true;
+    let validType = true;
+    let earnLimitExceeded = false;
+
+    //Do some checks to make sure this is legit user and transaction
+    //These are just examples and should be specific to your app
+
+    if(dest != 'GBADWYSILXOIKF7N7QGHPGXP64SFGRZX7T53OMWPU2FUCOEDFF7QJZBL'){
+        return 403;
+    }
+
+    if(!isMyUser){
+        // log user data, ip and return (for later evaluation of fraud)
+        return 403;
+    }
+
+    if(!validAmount){
+        // log user data, ip and return (for later evaluation of fraud)
+        return 403;
+    }
+
+    if(!validType){
+        // log user data, ip and return (for later evaluation of fraud)
+        return 403;
+    }
+
+    if(earnLimitExceeded){
+        return 403;
+    }    
+
+    //all checks passed, add to earn queue for processing
+    return addToEarnQueue(dest, amount);
 
 }
 
-//Cron Job?
-async function payRandom() { 
+//earn queue (not meant for production, will not save state on server crash)
+let earns = [];
 
+// Add to earn Queue
+async function addToEarnQueue(dest, amount) { 
+
+    earns.push(        
+        {
+            destination: sdk.PublicKey.fromString(dest),
+            quarks: sdk.kinToQuarks(amount),
+            type: sdk.TransactionType.Earn
+        }
+    )
+
+    return 200;
+    
 }
+
+var job = new CronJob('*/10 * * * * *', async function() {
+
+    const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
+
+    const earnList = earns;
+    earns = [];
+
+    if(earnList.length > 0){
+        try{
+
+            console.log('Submitting Earn Batch:');
+            console.log(new Date());
+            const result = await client.submitEarnBatch({
+                sender: sender,
+                earns: earnList
+                //memo: 'buy the ticket, take the ride'
+            });
+            console.log('Earn Batch Successful');
+            console.log(new Date());
+
+            console.log(bs58.encode(result.txId));
+
+            if(result.txError){
+                console.log(result.txError);
+            }
+
+            if(result.earnErrors){
+                console.log(result.earnErrors);
+            }
+
+            // if(result.txError){
+            //     console.log('Earn Batch Failed Tx:');
+
+                // for (let r of result.failed) {
+
+                //     let retryDest = r.earn.destination.stellarAddress();
+                //     let retryAmount = sdk.quarksToKin(r.earn.quarks);
+
+                //     console.log('adding to earn queue for retry');
+                //     addToEarnQueue(retryDest, retryAmount);
+
+                //     console.log(result.failed[0].error);
+
+                    // if destination does not exist, don't add back to queue
+                    ///if (result.failed[i].error){
+
+                    // // if insuffienient balance, dev wallet needs refilled
+                    // if(true){
+
+                    // }
+
+                // }
+
+            // }
+            // else{
+                //console.log('Earn Batch Success: ' + result.txId.toString('hex'))
+            // }
+        }
+        catch (e){
+            console.log('Earn Batch Error: ' + e);
+        }
+    }
+
+}, null, true, 'America/Los_Angeles');
+job.start();
+
+// //Cron Job?
+// async function payRandom() { 
+
+// }
 
 module.exports = {
     createAccount,
@@ -256,6 +375,6 @@ module.exports = {
     getKinTotalSupply,
     getKinInfo,
     sendKin,
-    earnEvent,
-    payRandom
+    earnEvent
+    //payRandom
 }
