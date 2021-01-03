@@ -271,10 +271,14 @@ async function earnEvent(dest, amount) {
 }
 
 //earn queue (not meant for production, will not save state on server crash)
-let earns = [];
+
 
 // Add to earn Queue
 async function addToEarnQueue(dest, amount) { 
+
+    const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
+
+    let earns = [];
 
     earns.push(        
         {
@@ -284,25 +288,14 @@ async function addToEarnQueue(dest, amount) {
         }
     )
 
-    return 200;
-    
-}
-
-var job = new CronJob('*/10 * * * * *', async function() {
-
-    const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
-
-    const earnList = earns;
-    earns = [];
-
-    if(earnList.length > 0){
+    if(earns.length > 0){
         try{
 
             console.log('Submitting Earn Batch:');
             console.log(new Date());
             const result = await client.submitEarnBatch({
                 sender: sender,
-                earns: earnList
+                earns: earns
                 //memo: 'buy the ticket, take the ride'
             });
             console.log('Earn Batch Successful');
@@ -348,11 +341,79 @@ var job = new CronJob('*/10 * * * * *', async function() {
         }
         catch (e){
             console.log('Earn Batch Error: ' + e);
+            return 500;
         }
     }
 
-}, null, true, 'America/Los_Angeles');
-job.start();
+    return 200;
+    
+}
+
+// var job = new CronJob('*/10 * * * * *', async function() {
+
+//     const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
+
+//     const earnList = earns;
+//     earns = [];
+
+//     if(earnList.length > 0){
+//         try{
+
+//             console.log('Submitting Earn Batch:');
+//             console.log(new Date());
+//             const result = await client.submitEarnBatch({
+//                 sender: sender,
+//                 earns: earnList
+//                 //memo: 'buy the ticket, take the ride'
+//             });
+//             console.log('Earn Batch Successful');
+//             console.log(new Date());
+
+//             console.log(bs58.encode(result.txId));
+
+//             if(result.txError){
+//                 console.log(result.txError);
+//             }
+
+//             if(result.earnErrors){
+//                 console.log(result.earnErrors);
+//             }
+
+//             // if(result.txError){
+//             //     console.log('Earn Batch Failed Tx:');
+
+//                 // for (let r of result.failed) {
+
+//                 //     let retryDest = r.earn.destination.stellarAddress();
+//                 //     let retryAmount = sdk.quarksToKin(r.earn.quarks);
+
+//                 //     console.log('adding to earn queue for retry');
+//                 //     addToEarnQueue(retryDest, retryAmount);
+
+//                 //     console.log(result.failed[0].error);
+
+//                     // if destination does not exist, don't add back to queue
+//                     ///if (result.failed[i].error){
+
+//                     // // if insuffienient balance, dev wallet needs refilled
+//                     // if(true){
+
+//                     // }
+
+//                 // }
+
+//             // }
+//             // else{
+//                 //console.log('Earn Batch Success: ' + result.txId.toString('hex'))
+//             // }
+//         }
+//         catch (e){
+//             console.log('Earn Batch Error: ' + e);
+//         }
+//     }
+
+// }, null, true, 'America/Los_Angeles');
+// job.start();
 
 // //Cron Job?
 // async function payRandom() { 
