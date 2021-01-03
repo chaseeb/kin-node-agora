@@ -156,19 +156,37 @@ async function getKinMarketCap() {
 
     //TODO: CoinMarketCap API
 
-    console.log('{marketCap}', kinPrice);
+    let circSupply = await getKinCircSupply();
+    let kinPrice = await getKinPrice();
+    let marketCap = circSupply * kinPrice;
 
-    return '100,000,000';
+    console.log('{marketCap}', marketCap);
+
+    return marketCap;
 
 }
 
 async function getKinCircSupply() { 
 
-    //TODO: Get Wallets
-
-    console.log('{circSupply}', '1,500,000,000,000');
-
-    return '1,500,000,000,000';
+    const wallets = [
+        'GCRHAQFQRKVXTDW6HELH6XLNENK2G2JLGUTRVZAWYTBWX5K3VJ75B6S5',
+        'GD2YFOMTV424PS3XKOF7IRAPHK36K4I3PGE6JNXA3OYYQTTX5X5CO5JN',
+        'GAJX4OVQRDJDNLIBWI3IBNEJU6QNGT3DZOOFMUV2Y7HTTZUDRGM6GU75']
+      
+        let totalWalletBalances = 0;
+      
+        for (let w of wallets) {
+          let publicKey = sdk.PublicKey.fromString(w);
+          let balance = await client.getBalance(publicKey);
+        
+          totalWalletBalances += parseInt(sdk.quarksToKin(balance));
+        }
+      
+        let circSupply = 10000000000000 - totalWalletBalances;
+    
+        console.log(circSupply);
+    
+        return circSupply;
 
 }
 
@@ -178,7 +196,7 @@ async function getKinTotalSupply() {
 
     console.log('{totalSupply}', '10,000,000,000,000');
 
-    return '10,000,000,000,000';
+    return 10000000000000;
 
 }
 
@@ -187,10 +205,10 @@ async function getKinInfo() {
     //make sure all of these are added to controller
 
     let kinInfo = {};
-    kinInfo.rank = await getKinRank();
+    //kinInfo.rank = await getKinRank();
     kinInfo.price = await getKinPrice();
-    kinInfo.getKinMarketCap = await getKinMarketCap()
     kinInfo.circulatingSupply = await getKinCircSupply();
+    kinInfo.getKinMarketCap = await getKinMarketCap();
     kinInfo.totalSupply = await getKinTotalSupply();
     kinInfo.date = new Date();
     //kinInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
