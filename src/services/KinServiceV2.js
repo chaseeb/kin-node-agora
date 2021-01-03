@@ -208,7 +208,7 @@ async function getKinInfo() {
     //kinInfo.rank = await getKinRank();
     kinInfo.price = await getKinPrice();
     kinInfo.circulatingSupply = await getKinCircSupply();
-    kinInfo.getKinMarketCap = await getKinMarketCap();
+    kinInfo.marketCap = await getKinMarketCap();
     kinInfo.totalSupply = await getKinTotalSupply();
     kinInfo.date = new Date();
     //kinInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
