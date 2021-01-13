@@ -9,23 +9,25 @@ const client = new sdk.Client(sdk.Environment.Prod, {
     appIndex: process.env.appIndex,
     whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
     kinVersion: 4,
-    retryConfig: {maxRetries: 10, maxNonceRefreshes: 10}
+    retryConfig: {maxRetries: 0}
   });
 
-  /**
-  * Create Account
-  * @return {JSON}      Keypair of newly created wallet
-  */
   async function createAccount() { 
 
     const privateKey = sdk.PrivateKey.random();
     await client.createAccount(privateKey);
 
     let createdAccount = {};
-    createdAccount.public = privateKey.publicKey().stellarAddress();
-    createdAccount.private = privateKey.stellarSeed();
+    createdAccount.stellarPublic = privateKey.publicKey().stellarAddress();
+    createdAccount.stellarPrivate = privateKey.stellarSeed();
+    createdAccount.solanaPublic = privateKey.publicKey().toBase58();
+    createdAccount.solanaPrivate = privateKey.toBase58();
 
-    console.log('{createdAccount}', createAccount);
+    console.log('{stellar.public}', createdAccount.stellarPublic);
+    console.log('{stellar.private}', createdAccount.stellarPrivate);
+
+    console.log('{solana.public}', createdAccount.solanaPublic);
+    console.log('{solana.private}',  createdAccount.solanaPrivate);
 
     return createdAccount;
 
@@ -131,14 +133,6 @@ async function getAccountInfo(publicAddress) {
 
 }
 
-async function getKinRank() { 
-
-    console.log('{rank}', 1);
-
-    return 1;
-
-}
-
 async function getKinPrice() { 
 
     // const response = await axios.get('https://www.coinbase.com/api/v2/assets/prices/238e025c-6b39-57ca-91d2-4ee7912cb518?base=USD');
@@ -205,7 +199,6 @@ async function getKinInfo() {
     //make sure all of these are added to controller
 
     let kinInfo = {};
-    //kinInfo.rank = await getKinRank();
     kinInfo.price = await getKinPrice();
     kinInfo.circulatingSupply = await getKinCircSupply();
     kinInfo.marketCap = await getKinMarketCap();
@@ -284,15 +277,12 @@ async function earnEvent(dest, amount) {
     }    
 
     //all checks passed, add to earn queue for processing
-    return addToEarnQueue(dest, amount);
+    return processEarn(dest, amount);
 
 }
 
-//earn queue (not meant for production, will not save state on server crash)
-
-
 // Add to earn Queue
-async function addToEarnQueue(dest, amount) { 
+async function processEarn(dest, amount) { 
 
     const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
 
@@ -447,7 +437,6 @@ module.exports = {
     getKinTokenAccount,
     getKinTokenAccountUrl,
     getAccountInfo,
-    getKinRank,
     getKinPrice,
     getKinMarketCap,
     getKinCircSupply,

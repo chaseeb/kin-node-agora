@@ -11,9 +11,9 @@ const server = app.listen(port, function() {
 const ejs = require('ejs');
 app.set('view engine', 'ejs'); 
 
-// process.on('uncaughtException', function(err) {
-//   console.log('Caught exception: ' + err);
-// });
+process.on('uncaughtException', function(err) {
+  console.log('Caught exception: ' + err);
+});
 
 //TODO: return the current API docs
 app.get('/', async function(req, res) {

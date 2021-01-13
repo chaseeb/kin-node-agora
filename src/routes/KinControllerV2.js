@@ -18,19 +18,21 @@ router.get('/createAccount', async function(req, res) {
     }
     catch(e){
         console.log(e);
-        res.status(500).json({error: "Error Creating Account"});
+        console.log(e.message);
+        res.status(500).json({error: e.message});
     }
 });
 
 // Get Transaction
-router.get('/transaction', async function(req, res) {
+router.get('/transaction/:txId', async function(req, res) {
     try{
-        const result = await KinService.getTransaction(req.parmas.txId);
+        const result = await KinServiceV2.getTransaction(req.params.txId);
         res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.json({error: 'Error Getting Transaction'});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -41,8 +43,9 @@ router.get('/balance/:publicAddress', async function(req, res) {
         return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting Balance"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -53,8 +56,9 @@ router.get('/usdValue/:publicAddress', async function(req, res) {
         return res.status(200).json(parseFloat(result));
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error USD Value"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -65,8 +69,9 @@ router.get('/solanaAddress/:publicAddress', async function(req, res) {
         return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting Solana Address"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -77,8 +82,9 @@ router.get('/kinTokenAccount/:publicAddress', async function(req, res) {
         return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting Kin Token Account Address"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -89,8 +95,9 @@ router.get('/kinTokenAccountUrl/:publicAddress', async function(req, res) {
         return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting Kin Token Account URL"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -103,8 +110,9 @@ router.get('/accountInfo/:publicAddress', async function(req, res) {
         //return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting User Account Info"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -115,8 +123,9 @@ router.get('/rank', async function(req, res) {
         return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting Rank"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -127,8 +136,9 @@ router.get('/price', async function(req, res) {
         return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting Price"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -138,8 +148,9 @@ router.get('/marketCap', async function(req, res) {
         return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting Market Cap"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -149,8 +160,9 @@ router.get('/circSupply', async function(req, res) {
         return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting Circulating Supply"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -160,8 +172,9 @@ router.get('/totalSupply', async function(req, res) {
         return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Getting Circulating Supply"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -174,8 +187,9 @@ router.get('/kinInfo', async function(req, res) {
         //return res.status(200).json(result);
     }
     catch(e){
-        console.log(e);
-        res.status(500).json({error: "Error Kin User Information"});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -186,8 +200,9 @@ router.get('/earnEvent', async function(req, res) {
         return res.sendStatus(result);
     }
     catch(e){
-        console.log(e);
-        res.json({error: 'Error Paying Earn'});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 });
 
@@ -199,8 +214,9 @@ router.get('/sendKin', async function(req, res) {
         return res.json({txHash:result});
     }
     catch(e){
-        console.log(e);
-        res.json({error: 'Errror Sending Kin'});
+        console.log(e.name);
+        console.log(e.message);
+        res.status(500).json({errorName: e.name, errorMessage: e.message});
     }
 
 });
