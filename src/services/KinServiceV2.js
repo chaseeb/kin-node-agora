@@ -51,10 +51,29 @@ async function getTransaction(txId) {
 
 }
 
+async function getPublicKey(publicAddress) { 
+
+    let publicKey;
+
+    try{
+        publicKey = sdk.PublicKey.fromBase58(publicAddress);
+    }
+    catch(e){
+        console.log('not base 58')
+    }
+
+    if(publicKey == null){
+        publicKey = sdk.PublicKey.fromString(publicAddress);
+    }
+
+    return publicKey;
+
+}
+
 //get balance of account using the public key 
 async function getBalance(publicAddress) { 
 
-    const publicKey = sdk.PublicKey.fromString(publicAddress);
+    let publicKey = await getPublicKey(publicAddress);
 
     let balance = await client.getBalance(publicKey);
     balance = sdk.quarksToKin(balance);
@@ -79,19 +98,30 @@ async function getUsdValue(publicAddress) {
 
 }
 
-async function getSolanaAddress(publicAddress) { 
+// async function getSolanaAddress(publicAddress) { 
 
-    const publicKey = sdk.PublicKey.fromString(publicAddress);
-    const solanaAddress = publicKey.toBase58();
+//     const publicKey = await getPublicKey(publicAddress);
+//     console.log(publicKey);
+//     const solanaAddress = publicKey.toBase58();
 
-    console.log('{solanaAddress}', solanaAddress);
+//     console.log('{solanaAddress}', solanaAddress);
 
-    return solanaAddress;
+//     return solanaAddress;
+// }
+
+async function getStellarAddress(publicAddress) { 
+
+    const publicKey = await getPublicKey(publicAddress);
+    const stellarAddress = publicKey.stellarAddress();
+
+    console.log('{stellarAddress}', stellarAddress);
+
+    return stellarAddress;
 }
 
 async function getKinTokenAccount(publicAddress) { 
 
-    const publicKey = sdk.PublicKey.fromString(publicAddress);
+    const publicKey = await getPublicKey(publicAddress);
     kinTokenAccount = await client.resolveTokenAccounts(publicKey);
     kinTokenAccount = kinTokenAccount[0].toBase58();
 
@@ -120,8 +150,8 @@ async function getAccountInfo(publicAddress) {
     accountInfo.kinBalance = await getBalance(publicAddress);
     accountInfo.usdValue = await getUsdValue(publicAddress);
     accountInfo.price = await getKinPrice();
-    accountInfo.stellarAddress = publicAddress;
-    accountInfo.solanaAddress = await getSolanaAddress(publicAddress);
+    accountInfo.stellarAddress = await getStellarAddress(publicAddress);
+    //accountInfo.solanaAddress = await getSolanaAddress(publicAddress);
     accountInfo.kinTokenAccount = await getKinTokenAccount(publicAddress);
     accountInfo.kinTokenAccountUrl = await getKinTokenAccountUrl(publicAddress);
     accountInfo.date = new Date();
@@ -141,7 +171,7 @@ async function getKinPrice() {
     const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
     const kinPrice = response.data.kin.usd;
 
-    console.log('{kinPice}', kinPrice);
+    console.log('{kinPrice}', kinPrice);
 
     return kinPrice;
 }
@@ -290,7 +320,7 @@ async function processEarn(dest, amount) {
 
     let earn = {};
 
-    earn.destination = sdk.PublicKey.fromString(dest);
+    earn.destination = await getPublicKey(dest);
     earn.quarks = sdk.kinToQuarks(amount);
     earn.type = sdk.TransactionType.Earn;
 
@@ -312,6 +342,9 @@ async function processEarn(dest, amount) {
                 //console.log(result.earnErrors)
                 return result.txErrors;
             }
+            else{
+                return bs58.encode(result.txId)
+            }
 
             // if(result.earnErrors){
             //     console.log(result.earnErrors);
@@ -323,7 +356,7 @@ async function processEarn(dest, amount) {
             return 500;
         }
     
-    return 200;
+    // return bs58.encode(result.txId);
     
 }
 
@@ -340,7 +373,7 @@ module.exports = {
     getTransaction,
     getBalance,
     getUsdValue,
-    getSolanaAddress,
+    //getSolanaAddress,
     getKinTokenAccount,
     getKinTokenAccountUrl,
     getAccountInfo,

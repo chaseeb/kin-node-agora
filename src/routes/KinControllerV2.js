@@ -63,17 +63,17 @@ router.get('/usdValue/:publicAddress', async function(req, res) {
 });
 
 // Get Solana Account Address from Stellar Address
-router.get('/solanaAddress/:publicAddress', async function(req, res) {
-    try{
-        const result = await KinServiceV2.getSolanaAddress(req.body.publicAddress);
-        return res.status(200).json(result);
-    }
-    catch(e){
-        console.log(e.name);
-        console.log(e.message);
-        res.status(500).json({errorName: e.name, errorMessage: e.message});
-    }
-});
+// router.get('/solanaAddress/:publicAddress', async function(req, res) {
+//     try{
+//         const result = await KinServiceV2.getSolanaAddress(req.body.publicAddress);
+//         return res.status(200).json(result);
+//     }
+//     catch(e){
+//         console.log(e.name);
+//         console.log(e.message);
+//         res.status(500).json({errorName: e.name, errorMessage: e.message});
+//     }
+// });
 
 // Get Kin Token Account Address from Stellar Address
 router.get('/kinTokenAccount/:publicAddress', async function(req, res) {
@@ -197,7 +197,7 @@ router.get('/kinInfo', async function(req, res) {
 router.get('/earnEvent', async function(req, res) {
     try{
         const result = await KinServiceV2.earnEvent(req.body.dest, req.body.amount);
-        return res.sendStatus(result);
+        return res.status(200).json(result);
     }
     catch(e){
         console.log(e.name);
