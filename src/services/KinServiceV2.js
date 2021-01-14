@@ -15,9 +15,14 @@ const client = new sdk.Client(sdk.Environment.Prod, {
   async function createAccount() { 
 
     const privateKey = sdk.PrivateKey.random();
+    let start = new Date();
+    console.log('Creating Account');
     await client.createAccount(privateKey);
+    let end = new Date();
+    console.log("Account Created In " + (end - start) / 1000 + ' seconds');
 
     let createdAccount = {};
+
     createdAccount.stellarPublic = privateKey.publicKey().stellarAddress();
     createdAccount.stellarPrivate = privateKey.stellarSeed();
     createdAccount.solanaPublic = privateKey.publicKey().toBase58();
@@ -25,7 +30,6 @@ const client = new sdk.Client(sdk.Environment.Prod, {
 
     console.log('{stellar.public}', createdAccount.stellarPublic);
     console.log('{stellar.private}', createdAccount.stellarPrivate);
-
     console.log('{solana.public}', createdAccount.solanaPublic);
     console.log('{solana.private}',  createdAccount.solanaPrivate);
 
@@ -98,17 +102,6 @@ async function getUsdValue(publicAddress) {
 
 }
 
-// async function getSolanaAddress(publicAddress) { 
-
-//     const publicKey = await getPublicKey(publicAddress);
-//     console.log(publicKey);
-//     const solanaAddress = publicKey.toBase58();
-
-//     console.log('{solanaAddress}', solanaAddress);
-
-//     return solanaAddress;
-// }
-
 async function getStellarAddress(publicAddress) { 
 
     const publicKey = await getPublicKey(publicAddress);
@@ -151,11 +144,9 @@ async function getAccountInfo(publicAddress) {
     accountInfo.usdValue = await getUsdValue(publicAddress);
     accountInfo.price = await getKinPrice();
     accountInfo.stellarAddress = await getStellarAddress(publicAddress);
-    //accountInfo.solanaAddress = await getSolanaAddress(publicAddress);
     accountInfo.kinTokenAccount = await getKinTokenAccount(publicAddress);
     accountInfo.kinTokenAccountUrl = await getKinTokenAccountUrl(publicAddress);
     accountInfo.date = new Date();
-    //accountInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
 
     console.log('account info', accountInfo);
 
@@ -234,7 +225,6 @@ async function getKinInfo() {
     kinInfo.marketCap = await getKinMarketCap();
     kinInfo.totalSupply = await getKinTotalSupply();
     kinInfo.date = new Date();
-    //kinInfo.apiDonationAddress = '2ufa5fC6vu9NrfgYjtQEbSMhfbL3oE4JoMvsKfYeXnsh';
 
     console.log(kinInfo);
 
@@ -255,8 +245,6 @@ async function sendKin(senderPrivate, destPublic, amount) {
         quarks: sdk.kinToQuarks(amount),
         type: sdk.TransactionType.Spend
     });
-
-    //if b58decode false, use this
 
     // let txHash = await client.submitPayment({
     //     sender: sender,
@@ -318,24 +306,24 @@ async function processEarn(dest, amount) {
 
     const sender = sdk.PrivateKey.fromString(process.env.prodPrivate);
 
-    let earn = {};
+    let earns = [{}];
 
-    earn.destination = await getPublicKey(dest);
-    earn.quarks = sdk.kinToQuarks(amount);
-    earn.type = sdk.TransactionType.Earn;
+    earns[0].destination = await getPublicKey(dest);
+    earns[0].quarks = sdk.kinToQuarks(amount);
+    earns[0].type = sdk.TransactionType.Earn;
 
         try{
-            console.log('Submitting Earn Batch:');
-            console.log(new Date());
+            console.log('Submitting Earn Batch');
+            let start = new Date();
             const result = await client.submitEarnBatch({
                 sender: sender,
-                earns: [earn]
-                //memo: 'buy the ticket, take the ride'
+                earns: earns
             });
-            console.log('Earn Batch Successful');
-            console.log(new Date());
 
-            console.log(bs58.encode(result.txId));
+            let end = new Date();
+            console.log('Earn Batch Completed In ' + (end - start) / 1000 + ' seconds');
+
+            console.log('Transaction ID: ' + bs58.encode(result.txId));
 
             if(result.txError){
                 console.log(result.txError);
@@ -345,7 +333,6 @@ async function processEarn(dest, amount) {
             else{
                 return bs58.encode(result.txId)
             }
-
             // if(result.earnErrors){
             //     console.log(result.earnErrors);
             // }
@@ -355,8 +342,6 @@ async function processEarn(dest, amount) {
             console.log('Earn Batch Error: ' + e);
             return 500;
         }
-    
-    // return bs58.encode(result.txId);
     
 }
 
@@ -373,7 +358,6 @@ module.exports = {
     getTransaction,
     getBalance,
     getUsdValue,
-    //getSolanaAddress,
     getKinTokenAccount,
     getKinTokenAccountUrl,
     getAccountInfo,
