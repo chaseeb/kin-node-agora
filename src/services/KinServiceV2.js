@@ -221,6 +221,7 @@ async function getKinInfo() {
 
     let kinInfo = {};
     kinInfo.price = await getKinPrice();
+    kinInfo.priceChange24Hour = dailyPercentChange;
     kinInfo.circulatingSupply = await getKinCircSupply();
     kinInfo.marketCap = await getKinMarketCap();
     kinInfo.totalSupply = await getKinTotalSupply();
@@ -325,17 +326,17 @@ async function processEarn(dest, amount) {
 
             console.log('Transaction ID: ' + bs58.encode(result.txId));
 
+            //result{txid, txerror, earnerrors[{error, earnindex}]}
+
             if(result.txError){
-                console.log(result.txError);
+                // console.log(result.txError);
+                console.log(result);
                 //console.log(result.earnErrors)
-                return result.txErrors;
+                return result.txError.name;
             }
             else{
                 return bs58.encode(result.txId)
             }
-            // if(result.earnErrors){
-            //     console.log(result.earnErrors);
-            // }
 
         }
         catch (e){
@@ -345,13 +346,40 @@ async function processEarn(dest, amount) {
     
 }
 
-// var job = new CronJob('*/10 * * * * *', async function() {
+let lastKinPrice;
+let dailyPercentChange = 0;
+let date = new Date();
+setLastKinPrice();
 
-//     console.log('pay random');
-//     //pay random address
+async function setLastKinPrice() { 
 
-// }, null, true, 'America/Los_Angeles');
-// job.start();
+    lastKinPrice = await getKinPrice()
+
+}
+
+var job = new CronJob('*/10 * * * * *', async function() {
+
+    console.log("-----");
+
+    let kinPrice = await getKinPrice();
+
+    let change = kinPrice - lastKinPrice;
+    let percentChange = (change / lastKinPrice) * 100;
+    dailyPercentChange += percentChange;
+
+    console.log('24hourChange: ' + dailyPercentChange + '%');
+    console.log(new Date());
+    console.log("-----");
+
+    lastKinPrice = kinPrice;
+
+    if(date.toDateString() != new Date().toDateString()){
+        date = new Date();
+        dailyPercentChange = 0;
+    }
+
+}, null, true, 'America/Los_Angeles');
+job.start();
 
 module.exports = {
     createAccount,
