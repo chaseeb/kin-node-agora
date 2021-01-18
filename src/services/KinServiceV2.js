@@ -221,7 +221,7 @@ async function getKinInfo() {
 
     let kinInfo = {};
     kinInfo.price = await getKinPrice();
-    kinInfo.priceChange24Hour = dailyPercentChange;
+    //kinInfo.priceChange24Hour = dailyPercentChange;
     kinInfo.circulatingSupply = await getKinCircSupply();
     kinInfo.marketCap = await getKinMarketCap();
     kinInfo.totalSupply = await getKinTotalSupply();
