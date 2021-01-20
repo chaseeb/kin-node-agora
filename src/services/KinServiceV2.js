@@ -12,7 +12,22 @@ const client = new sdk.Client(sdk.Environment.Prod, {
     retryConfig: {maxRetries: 0}
   });
 
-  async function createAccount() { 
+let kinDailyStartPrice;
+let date = new Date();
+
+async function init() { 
+
+    kinDailyStartPrice = await getKinPrice();
+
+    //set daily price
+    //set current date
+    //set other stuff
+
+}
+
+init();
+
+async function createAccount() { 
 
     const privateKey = sdk.PrivateKey.random();
     let start = new Date();
@@ -162,9 +177,18 @@ async function getKinPrice() {
     const response = await axios.get('https://api.coingecko.com/api/v3/simple/price?ids=kin&vs_currencies=usd');
     const kinPrice = response.data.kin.usd;
 
-    console.log('{kinPrice}', kinPrice);
-
     return kinPrice;
+}
+
+async function get24HourChange() { 
+
+    let kinPrice = await getKinPrice();
+
+    let change = kinPrice - kinDailyStartPrice;
+    let percentChange = (change / kinDailyStartPrice) * 100;
+
+    return percentChange;
+
 }
 
 async function getKinMarketCap() { 
@@ -175,14 +199,13 @@ async function getKinMarketCap() {
     let kinPrice = await getKinPrice();
     let marketCap = circSupply * kinPrice;
 
-    console.log('{marketCap}', marketCap);
-
     return marketCap;
 
 }
 
 async function getKinCircSupply() { 
 
+    //move to .env so this repo can be public
     const wallets = [
         'GCRHAQFQRKVXTDW6HELH6XLNENK2G2JLGUTRVZAWYTBWX5K3VJ75B6S5',
         'GD2YFOMTV424PS3XKOF7IRAPHK36K4I3PGE6JNXA3OYYQTTX5X5CO5JN',
@@ -199,17 +222,11 @@ async function getKinCircSupply() {
       
         let circSupply = 10000000000000 - totalWalletBalances;
     
-        console.log(circSupply);
-    
         return circSupply;
 
 }
 
 async function getKinTotalSupply() { 
-
-    //TODO: Add to controller
-
-    console.log('{totalSupply}', '10,000,000,000,000');
 
     return 10000000000000;
 
@@ -220,19 +237,20 @@ async function getKinInfo() {
     //make sure all of these are added to controller
 
     let kinInfo = {};
+
     kinInfo.price = await getKinPrice();
-    //kinInfo.priceChange24Hour = dailyPercentChange;
+    kinInfo.priceChange24Hour = await get24HourChange() + '%';
     kinInfo.circulatingSupply = await getKinCircSupply();
     kinInfo.marketCap = await getKinMarketCap();
     kinInfo.totalSupply = await getKinTotalSupply();
     kinInfo.date = new Date();
 
-    console.log(kinInfo);
-
     return kinInfo;
 }
 
 //send kin with using the senders private key and receivers public key
+//it is never recommended to end your private key over the internet
+//this is meant as an example only
 async function sendKin(senderPrivate, destPublic, amount) { 
 
     const sender = sdk.PrivateKey.fromString(senderPrivate);
@@ -346,36 +364,12 @@ async function processEarn(dest, amount) {
     
 }
 
-let lastKinPrice;
-let dailyPercentChange = 0;
-let date = new Date();
-setLastKinPrice();
-
-async function setLastKinPrice() { 
-
-    lastKinPrice = await getKinPrice()
-
-}
-
 var job = new CronJob('*/10 * * * * *', async function() {
 
-    console.log("-----");
-
-    let kinPrice = await getKinPrice();
-
-    let change = kinPrice - lastKinPrice;
-    let percentChange = (change / lastKinPrice) * 100;
-    dailyPercentChange += percentChange;
-
-    console.log('24hourChange: ' + dailyPercentChange + '%');
-    console.log(new Date());
-    console.log("-----");
-
-    lastKinPrice = kinPrice;
+    console.log('Price Change 24 Hour: ' + await get24HourChange() + '%');
 
     if(date.toDateString() != new Date().toDateString()){
         date = new Date();
-        dailyPercentChange = 0;
     }
 
 }, null, true, 'America/Los_Angeles');
