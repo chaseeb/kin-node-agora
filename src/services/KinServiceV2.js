@@ -64,8 +64,6 @@ async function getTransaction(txId) {
     transactionData.destination = result.payments[0].destination.toBase58();
     transactionData.amount = sdk.quarksToKin(result.payments[0].quarks);
 
-    console.log('{transactionData}', transactionData);
-
     return transactionData;
 
 }
@@ -97,8 +95,6 @@ async function getBalance(publicAddress) {
     let balance = await client.getBalance(publicKey);
     balance = sdk.quarksToKin(balance);
     //balance = parseInt(sdk.quarksToKin(balance)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-
-    console.log('{balance}', balance);
   
     return balance;
 
@@ -111,8 +107,6 @@ async function getUsdValue(publicAddress) {
     let usdBalance = balance * kinPrice;
     //usdBalance = parseInt(usdBalance).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     
-    console.log('{usdValue}', usdBalance.toFixed(2));
-    
     return usdBalance.toFixed(2);
 
 }
@@ -122,8 +116,6 @@ async function getStellarAddress(publicAddress) {
     const publicKey = await getPublicKey(publicAddress);
     const stellarAddress = publicKey.stellarAddress();
 
-    console.log('{stellarAddress}', stellarAddress);
-
     return stellarAddress;
 }
 
@@ -132,8 +124,6 @@ async function getKinTokenAccount(publicAddress) {
     const publicKey = await getPublicKey(publicAddress);
     kinTokenAccount = await client.resolveTokenAccounts(publicKey);
     kinTokenAccount = kinTokenAccount[0].toBase58();
-
-    console.log('{kinTokenAccount}', kinTokenAccount);
 
     return kinTokenAccount;
 
@@ -244,6 +234,8 @@ async function getKinInfo() {
     kinInfo.marketCap = await getKinMarketCap();
     kinInfo.totalSupply = await getKinTotalSupply();
     kinInfo.date = new Date();
+
+    console.log(kinInfo);
 
     return kinInfo;
 }
