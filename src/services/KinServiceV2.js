@@ -9,7 +9,7 @@ const client = new sdk.Client(sdk.Environment.Prod, {
     appIndex: process.env.appIndex,
     whitelistKey: sdk.PrivateKey.fromString(process.env.prodPrivate),
     kinVersion: 4,
-    retryConfig: {maxRetries: 0}
+    retryConfig: {maxRetries: 0, maxNonceRefreshes: 5}
   });
 
 let kinDailyStartPrice;
@@ -230,8 +230,8 @@ async function getKinInfo() {
 
     kinInfo.price = await getKinPrice();
     kinInfo.priceChange24Hour = await get24HourChange() + '%';
-    kinInfo.circulatingSupply = await getKinCircSupply();
-    kinInfo.marketCap = await getKinMarketCap();
+    //kinInfo.circulatingSupply = await getKinCircSupply();
+    //kinInfo.marketCap = await getKinMarketCap();
     kinInfo.totalSupply = await getKinTotalSupply();
     kinInfo.date = new Date();
 
